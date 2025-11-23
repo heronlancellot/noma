@@ -4,8 +4,6 @@ import { Page } from '@/components/PageLayout';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { WarningTriangle } from 'iconoir-react';
-import Image from 'next/image';
-import NomadBad from '@/assets/NOMADBAD.svg';
 
 interface ReportFormData {
   experienceName: string;
@@ -93,10 +91,6 @@ export default function ReportPage() {
             <p className="text-white text-sm leading-relaxed max-w-[240px] text-center">
               This isn&apos;t the experience we aim for. Tell us what happened so we can fix it.
             </p>
-            {/* Sad Sun Illustration */}
-            <div className="flex-shrink-0 mt-1">
-              <Image src={NomadBad} alt="Nomad Bad" width={100} height={100} />
-            </div>
           </div>
         </div>
 
