@@ -68,21 +68,6 @@ export const Navigation = () => {
           <Plus className="w-7 h-7" strokeWidth={2.5} />
         </button>
 
-        {/* Bell Icon with Notification Badge */}
-        <button
-          onClick={() => { setActiveTab('notifications'); router.push('/notifications'); } }
-          className="relative flex flex-col items-center justify-center p-2 transition-colors"
-          aria-label="Notifications"
-        >
-          <Bell 
-            className={`w-6 h-6 ${activeTab === 'notifications' ? 'text-[#db5852]' : 'text-[#757683]'}`} 
-            strokeWidth={2} 
-          />
-          <span className="absolute top-0 right-0 w-4 h-4 bg-[#db5852] rounded-full border-2 border-white flex items-center justify-center">
-            <span className="text-white text-[9px] font-bold leading-none">1</span>
-          </span>
-        </button>
-
         {/* Profile Picture */}
         <button
           onClick={() => { setActiveTab('profile'); router.push('/profile'); } }
