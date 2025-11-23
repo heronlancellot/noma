@@ -5,12 +5,17 @@ import { Navigation } from '@/components/Navigation';
 import { Marble } from '@worldcoin/mini-apps-ui-kit-react';
 import { Pin, ArrowLeft, ArrowRight } from 'iconoir-react';
 import Image from 'next/image';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { getExperienceDetails } from '@/lib/contractUtils';
 import { formatUnits } from 'viem';
 import { MiniKit } from '@worldcoin/minikit-js';
+import { useWaitForTransactionReceipt } from '@worldcoin/minikit-react';
+import { createPublicClient, http } from 'viem';
+import { worldchain } from 'viem/chains';
 import { NOMAD_EXPERIENCE_ADDRESS, NOMAD_EXPERIENCE_ABI } from '@/contracts/constants';
+import { useSession } from 'next-auth/react';
+import { Settings } from 'iconoir-react';
 
 interface ExperienceData {
   id: string;
@@ -23,6 +28,7 @@ interface ExperienceData {
   ratingCount: number;
   recommendation: number;
   images: string[];
+  creator: string; // Add creator address
   organizer: {
     name: string;
     avatar?: string;
@@ -34,12 +40,40 @@ interface ExperienceData {
 
 export default function ExperienceDetailPage() {
   const params = useParams();
+  const router = useRouter();
+  const { data: session } = useSession();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [experience, setExperience] = useState<ExperienceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [joinLoading, setJoinLoading] = useState(false);
+  const [transactionId, setTransactionId] = useState<string>('');
 
   const experienceId = params.id as string;
+  
+  // Check if current user is the creator
+  const isCreator = experience && session?.user && (
+    (session.user.walletAddress?.toLowerCase() === experience.creator.toLowerCase()) ||
+    (session.user.id?.toLowerCase() === experience.creator.toLowerCase())
+  );
+
+  const client = createPublicClient({
+    chain: worldchain,
+    transport: http('https://worldchain-mainnet.g.alchemy.com/public'),
+  });
+
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+    isError,
+    error: transactionError,
+  } = useWaitForTransactionReceipt({
+    client: client,
+    appConfig: {
+      app_id: process.env.NEXT_PUBLIC_WLD_CLIENT_ID as `app_${string}`,
+    },
+    transactionId: transactionId,
+  });
 
   useEffect(() => {
     const fetchExperience = async () => {
@@ -68,6 +102,7 @@ export default function ExperienceDetailPage() {
           ratingCount: Number(data.participantCount),
           recommendation: 98, // Default
           images: data.coverImage ? [data.coverImage] : ['https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=600&fit=crop'],
+          creator: data.creator, // Store creator address
           organizer: {
             name: data.creator.slice(0, 6) + '...' + data.creator.slice(-4),
             avatar: undefined,
@@ -88,6 +123,21 @@ export default function ExperienceDetailPage() {
 
     fetchExperience();
   }, [experienceId]);
+
+  // Handle transaction confirmation and redirect
+  useEffect(() => {
+    if (transactionId && !isConfirming) {
+      if (isConfirmed) {
+        console.log('✅ Transaction confirmed! Redirecting to confirmation page...');
+        // Redirect to confirmation page after successful transaction
+        router.push(`/experience/${experienceId}/confirmation`);
+      } else if (isError) {
+        console.error('❌ Transaction failed:', transactionError);
+        setJoinLoading(false);
+        setTransactionId('');
+      }
+    }
+  }, [isConfirmed, isConfirming, isError, transactionError, transactionId, router, experienceId]);
 
   if (loading) {
     return (
@@ -127,13 +177,24 @@ export default function ExperienceDetailPage() {
     );
   };
 
-  const handleRequestJoin = async (experienceId: bigint) => {
+  const handleRequestJoin = async (experienceIdBigInt: bigint) => {
+    if (!experience) return;
+
     try {
+      setJoinLoading(true);
+      setTransactionId('');
+
       // Parse price from experience (remove '$' and convert to wei)
       const priceInUSD = parseFloat(experience.price.replace('$', ''));
       const priceInWei = BigInt(Math.floor(priceInUSD * 1e18));
       // Convert to hex string for MiniKit
       const priceInHex = '0x' + priceInWei.toString(16);
+
+      console.log('Requesting join with:', {
+        experienceId: experienceIdBigInt.toString(),
+        priceInWei: priceInWei.toString(),
+        priceInHex,
+      });
 
       const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
         transaction: [
@@ -141,24 +202,42 @@ export default function ExperienceDetailPage() {
             address: NOMAD_EXPERIENCE_ADDRESS,
             abi: NOMAD_EXPERIENCE_ABI,
             functionName: 'requestJoin',
-            args: [experienceId],
+            args: [Number(experienceId)],
             value: priceInHex,
           },
         ],
       });
+
       console.log('Join request response:', finalPayload);
       if (finalPayload.status === 'success') {
-        console.log('Join request submitted, waiting for confirmation:', finalPayload.transaction_id);
+        console.log('✅ Join request submitted, waiting for confirmation:', finalPayload.transaction_id);
+        setTransactionId(finalPayload.transaction_id);
       } else {
-        console.error('Join request failed:', finalPayload);
+        console.error('❌ Join request failed:', finalPayload);
+        setJoinLoading(false);
       }
     } catch (error) {
-      console.error('Error requesting join:', error);
+      console.error('❌ Error requesting join:', error);
+      setJoinLoading(false);
     }
   };
 
   return (
     <Page className="bg-white">
+      {/* Header with Manage Button for Creator */}
+      {isCreator && (
+        <div className="absolute top-4 right-4 z-20">
+          <button
+            onClick={() => router.push(`/experience/${experienceId}/manage`)}
+            className="bg-white/90 backdrop-blur-sm hover:bg-white text-[#1f1f1f] p-2.5 rounded-full transition-colors shadow-md"
+            aria-label="Manage Experience"
+            title="Manage Experience"
+          >
+            <Settings className="w-5 h-5" strokeWidth={2.5} />
+          </button>
+        </div>
+      )}
+
       {/* Image Carousel */}
       <div className="relative w-full h-[50vh] min-h-[400px]">
         <Image
@@ -213,13 +292,24 @@ export default function ExperienceDetailPage() {
               {experience.rating} Rating ({experience.ratingCount})
             </p>
           </div>
-          <button className="bg-[#db5852] hover:bg-[#c94a44] active:bg-[#b73d38] text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors"
-          onClick={() => {
-            handleRequestJoin(BigInt(experience.id));
-          }}
-          >
-            Confirm
-          </button>
+          {isCreator ? (
+            <button
+              onClick={() => router.push(`/experience/${experienceId}/manage`)}
+              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+            >
+              Manage
+            </button>
+          ) : (
+            <button 
+              className="bg-[#db5852] hover:bg-[#c94a44] active:bg-[#b73d38] disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+              onClick={() => {
+                handleRequestJoin(BigInt(experience.id));
+              }}
+              disabled={joinLoading || isConfirming}
+            >
+              {joinLoading || isConfirming ? 'Processing...' : 'Confirm'}
+            </button>
+          )}
         </div>
 
         {/* Description */}

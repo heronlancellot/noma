@@ -143,3 +143,41 @@ export async function getExperienceDetails(experienceId: number) {
     throw error;
   }
 }
+
+/**
+ * Fetch join requests for an experience
+ */
+export async function getJoinRequests(experienceId: number) {
+  try {
+    const requests = (await publicClient.readContract({
+      address: NOMAD_EXPERIENCE_ADDRESS,
+      abi: NOMAD_EXPERIENCE_ABI,
+      functionName: 'getJoinRequests',
+      args: [experienceId],
+    })) as readonly `0x${string}`[];
+
+    return requests;
+  } catch (error) {
+    console.error(`Error fetching join requests for experience ${experienceId}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch approved participants for an experience
+ */
+export async function getParticipants(experienceId: number) {
+  try {
+    const participants = (await publicClient.readContract({
+      address: NOMAD_EXPERIENCE_ADDRESS,
+      abi: NOMAD_EXPERIENCE_ABI,
+      functionName: 'getParticipants',
+      args: [experienceId],
+    })) as readonly `0x${string}`[];
+
+    return participants;
+  } catch (error) {
+    console.error(`Error fetching participants for experience ${experienceId}:`, error);
+    throw error;
+  }
+}
