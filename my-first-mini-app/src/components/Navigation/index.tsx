@@ -1,6 +1,6 @@
 'use client';
 
-import { Compass, Calendar, Plus, Bell } from 'iconoir-react';
+import { Compass, Calendar, Plus } from 'iconoir-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
