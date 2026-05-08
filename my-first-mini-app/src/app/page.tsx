@@ -1,16 +1,24 @@
 'use client';
 
-import { Page } from '@/components/PageLayout';
 import { EventList, Event } from '@/components/EventList';
 import { SearchBar } from '@/components/SearchBar';
 import { Navigation } from '@/components/Navigation';
 import { LoginPage } from '@/components/LoginPage';
-import { QrCode } from 'iconoir-react';
 import { useState, useMemo, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useExperiences } from '@/hooks/useExperiences';
 import { formatUnits } from 'viem';
 import { getUserExperienceStatus } from '@/lib/contractUtils';
+
+const guessCategory = (title: string, desc: string): string | undefined => {
+  const text = (title + ' ' + desc).toLowerCase();
+  if (/hik|trek|mount|trail|climb/.test(text)) return 'Hiking';
+  if (/surf|wave|beach|ocean|sea/.test(text)) return 'Surf';
+  if (/yoga|meditat|wellness|breath/.test(text)) return 'Yoga';
+  if (/social|meet|network|tango|dance|party|gather/.test(text)) return 'Social';
+  if (/cultur|art|museum|histor|tour/.test(text)) return 'Cultura';
+  return undefined;
+};
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -18,7 +26,6 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [eventsWithStatus, setEventsWithStatus] = useState<Event[]>([]);
 
-  // Convert blockchain experiences to UI events
   const baseEvents = useMemo(() => {
     return experiences.map((exp): Event => ({
       id: exp.id.toString(),
@@ -26,138 +33,121 @@ export default function HomePage() {
       description: exp.description,
       organizer: exp.creator,
       organizerAvatar: undefined,
-      price: `$${formatUnits(exp.price, 18)}`,
-      rating: 4.5, // Default rating - can be fetched from separate contract if available
-      image: exp.coverImage || 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&h=400&fit=crop',
+      price: (() => {
+        const num = parseFloat(formatUnits(exp.price, 18));
+        if (num === 0 || num < 0.01) return 'Free';
+        return `$${num % 1 === 0 ? num.toFixed(0) : num.toFixed(2)}`;
+      })(),
+      rating: 4.5,
+      image: exp.coverImage || '/image-default.png',
       location: exp.location,
-      status: 'none', // Will be updated
+      category: guessCategory(exp.title, exp.description),
+      status: 'none',
     }));
   }, [experiences]);
 
-  // Fetch status for each experience
   useEffect(() => {
     const fetchStatuses = async () => {
-      if (!session?.user || baseEvents.length === 0) {
-        setEventsWithStatus(baseEvents);
-        return;
-      }
-
+      if (!session?.user || baseEvents.length === 0) { setEventsWithStatus(baseEvents); return; }
       const userAddress = session.user.walletAddress || session.user.id;
-      if (!userAddress) {
-        setEventsWithStatus(baseEvents);
-        return;
-      }
-
-      // Fetch status for all experiences in parallel
-      const eventsWithStatusPromises = baseEvents.map(async (event) => {
+      if (!userAddress) { setEventsWithStatus(baseEvents); return; }
+      const promises = baseEvents.map(async (event) => {
         try {
-          const experienceStatus = await getUserExperienceStatus(
-            Number(event.id),
-            userAddress
-          );
-          return {
-            ...event,
-            status: experienceStatus,
-          };
-        } catch (err) {
-          console.error(`Error fetching status for experience ${event.id}:`, err);
-          return event; // Keep original status if error
-        }
+          const s = await getUserExperienceStatus(Number(event.id), userAddress);
+          return { ...event, status: s };
+        } catch { return event; }
       });
-
-      const eventsWithStatus = await Promise.all(eventsWithStatusPromises);
-      setEventsWithStatus(eventsWithStatus);
+      setEventsWithStatus(await Promise.all(promises));
     };
-
     fetchStatuses();
   }, [baseEvents, session]);
 
-  // Filtered events based on search
   const filteredEvents = useMemo(() => {
-    const eventsToFilter = eventsWithStatus.length > 0 ? eventsWithStatus : baseEvents;
-    if (searchQuery.trim() === '') {
-      return eventsToFilter;
-    }
-    return eventsToFilter.filter(
-      (event) =>
-        event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.description.toLowerCase().includes(searchQuery.toLowerCase())
+    const base = eventsWithStatus.length > 0 ? eventsWithStatus : baseEvents;
+    if (!searchQuery.trim()) return base;
+    return base.filter(e =>
+      e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      e.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [eventsWithStatus, baseEvents, searchQuery]);
 
-  // Show login page if not authenticated
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#db5852]"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#fff8f7' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: '#a7322f' }} />
       </div>
     );
   }
 
-  if (!session) {
-    return <LoginPage />;
-  }
+  if (!session) return <LoginPage />;
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
-
-  const handleJoinEvent = (eventId: string) => {
-    console.log('Join event:', eventId);
-    // Implementar lógica de participação no evento
-  };
-
-  const handleFilterClick = () => {
-    console.log('Filter clicked');
-    // Implementar lógica de filtros
-  };
+  const userName = session?.user?.name?.split(' ')[0] ?? 'Explorer';
+  const avatarUrl = session?.user?.profilePictureUrl;
 
   return (
-    <Page className="bg-white">
-      <Page.Header className="bg-white pt-4 pb-3">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-[20px] font-bold text-[#1f1f1f] leading-tight">
-            Hello, Mikaele!
-          </h1>
-          <button
-            className="text-[#db5852] hover:bg-gray-50 p-2 rounded-lg transition-colors"
-            aria-label="QR Code"
-          >
-            <QrCode className="w-6 h-6" strokeWidth={2} />
-          </button>
-        </div>
-        <SearchBar onSearch={handleSearch} onFilterClick={handleFilterClick} />
-      </Page.Header>
+    <div className="min-h-screen flex flex-col pb-24 relative overflow-x-hidden" style={{ backgroundColor: '#fff8f7', fontFamily: 'Poppins, sans-serif' }}>
 
-      <Page.Main className="pb-28 bg-white px-4">
-        {loading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#db5852] mx-auto mb-2"></div>
-              <p className="text-gray-600">Carregando experiências...</p>
+      {/* ── STICKY HEADER ── */}
+      <header
+        className="px-5 pt-8 pb-6 flex justify-between items-center sticky top-0 z-40"
+        style={{ backgroundColor: '#fff8f7' }}
+      >
+        <div>
+          <h1 style={{ fontFamily: 'Quicksand, sans-serif', fontSize: 32, fontWeight: 700, color: '#251918', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+            Hello, {userName} 👋
+          </h1>
+        </div>
+        <div
+          className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2"
+          style={{ borderColor: '#ffffff', boxShadow: '0px 2px 4px rgba(13,31,53,0.06)' }}
+        >
+          {avatarUrl ? (
+            <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#251918' }}>
+              <span style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>{userName.charAt(0).toUpperCase()}</span>
             </div>
-          </div>
-        )}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mx-4 mt-4">
-            <p className="text-red-800 font-medium">Erro ao carregar experiências</p>
-            <p className="text-red-600 text-sm">{error}</p>
-          </div>
-        )}
-        {!loading && !error && (
-          <>
-            {filteredEvents.length === 0 ? (
-              <div className="flex items-center justify-center py-12">
-                <p className="text-gray-600">Nenhuma experiência encontrada</p>
-              </div>
-            ) : (
-              <EventList events={filteredEvents} onJoinEvent={handleJoinEvent} />
-            )}
-          </>
-        )}
-      </Page.Main>
+          )}
+        </div>
+      </header>
+
+      {/* ── MAIN ── */}
+      <main className="flex-grow flex flex-col px-5 gap-8">
+
+        {/* Search + categories */}
+        <SearchBar onSearch={setSearchQuery} onFilterClick={() => {}} />
+
+        {/* Cards */}
+        <div className="flex-grow">
+          {loading && (
+            <div className="flex flex-col items-center py-16 gap-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: '#a7322f' }} />
+              <p style={{ fontSize: 14, color: '#58413f' }}>Loading experiences...</p>
+            </div>
+          )}
+
+          {error && (
+            <div className="rounded-xl p-4" style={{ backgroundColor: '#ffdad6', border: '1px solid #ffb3ad' }}>
+              <p style={{ fontWeight: 600, fontSize: 14, color: '#410003' }}>Failed to load experiences</p>
+              <p style={{ fontSize: 13, color: '#93000a', marginTop: 4 }}>{error}</p>
+            </div>
+          )}
+
+          {!loading && !error && filteredEvents.length === 0 && (
+            <div className="flex flex-col items-center py-16 gap-3">
+              <span style={{ fontSize: 48 }}>🌤️</span>
+              <p style={{ fontSize: 15, fontWeight: 500, color: '#58413f' }}>No experiences found</p>
+              <p style={{ fontSize: 13, color: '#8b716e' }}>Try a different search or filter</p>
+            </div>
+          )}
+
+          {!loading && !error && filteredEvents.length > 0 && (
+            <EventList events={filteredEvents} onJoinEvent={(id) => console.log('Join:', id)} />
+          )}
+        </div>
+      </main>
 
       <Navigation />
-    </Page>
+    </div>
   );
 }

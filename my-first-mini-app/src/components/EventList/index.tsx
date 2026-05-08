@@ -12,6 +12,7 @@ export interface Event {
   rating: number;
   image: string;
   location?: string;
+  category?: string;
   status?: 'none' | 'requested' | 'approved';
 }
 

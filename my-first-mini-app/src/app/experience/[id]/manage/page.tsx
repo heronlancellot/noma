@@ -97,7 +97,7 @@ export default function ExperienceManagePage() {
           location: data.location,
           rating: 4.8,
           ratingCount: Number(data.participantCount),
-          images: data.coverImage ? [data.coverImage] : ['https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=600&fit=crop'],
+          images: data.coverImage ? [data.coverImage] : ['/image-default.png'],
           creator: data.creator,
         };
 

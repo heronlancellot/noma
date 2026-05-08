@@ -1,250 +1,317 @@
 'use client';
 
-import { Page } from '@/components/PageLayout';
+import { Navigation } from '@/components/Navigation';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { getUserProfile, getUserApprovedExperiences } from '@/lib/contractUtils';
 import Image from 'next/image';
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 interface NFTItem {
   id: string;
   title: string;
-  subtitle: string;
   image: string;
-  timestamp: string;
+  date: string;
+  rarity: 'Rare' | 'Common' | 'Epic';
 }
 
 interface ProfileData {
-  exists: boolean;
   hostedCount: number;
   attendedCount: number;
-  lastJoinedTimestamp: number;
-  lastHostedTimestamp: number;
-  experiencesCount: number;
   peopleMetCount: number;
   nftGallery: NFTItem[];
   missionProgress: number;
+  missionLabel: string;
+  missionNext: string;
 }
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const RARITY_CLASS: Record<string, string> = {
+  Rare:   'bg-[#d3a500] text-white',
+  Common: 'bg-white text-[#4f5f78] border border-[#dfbfbc]',
+  Epic:   'bg-[#a7322f] text-white',
+};
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function NFTImagePlaceholder() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center bg-[#f4dddb]">
+      <svg
+        width="32" height="32" fill="none" stroke="#8b716e"
+        strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+        viewBox="0 0 24 24"
+      >
+        <rect x="3" y="3" width="18" height="18" rx="3" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+        <polyline points="21 15 16 10 5 21" />
+      </svg>
+    </div>
+  );
+}
+
+function NFTCard({ nft }: { nft: NFTItem }) {
+  const [imgError, setImgError] = useState(false);
+
+  return (
+    <div className="overflow-hidden rounded-2xl bg-white border border-[#f4dddb] shadow-sm">
+      {/* Image */}
+      <div className="relative h-32 w-full">
+        {imgError ? (
+          <NFTImagePlaceholder />
+        ) : (
+          <Image
+            src={nft.image}
+            alt={nft.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 50vw, 200px"
+            onError={() => setImgError(true)}
+          />
+        )}
+        <div className="absolute inset-0 bg-black/[0.08]" />
+        <span
+          className={`absolute top-2 left-2 text-[10px] font-semibold uppercase tracking-[0.05em] px-[9px] py-[3px] rounded-full ${RARITY_CLASS[nft.rarity]}`}
+        >
+          {nft.rarity}
+        </span>
+      </div>
+
+      {/* Body */}
+      <div className="p-3">
+        <p className="text-sm font-semibold truncate text-[#251918]">{nft.title}</p>
+        <p className="text-xs mt-0.5 text-[#4f5f78]">{nft.date}</p>
+      </div>
+    </div>
+  );
+}
+
+function NFTEmptyState() {
+  return (
+    <div className="col-span-2 flex flex-col items-center gap-3 rounded-2xl bg-white border border-[#f4dddb] py-10 px-6 text-center shadow-sm">
+      <div className="w-16 h-16 rounded-2xl bg-[#f4dddb] flex items-center justify-center text-3xl">
+        🎖️
+      </div>
+      <p className="font-quicksand-bold text-[17px] text-[#251918]">
+        Ainda sem NFTs
+      </p>
+      <p className="text-[13px] text-[#58413f] leading-relaxed">
+        Participe de experiências para ganhar badges exclusivos e construir sua coleção.
+      </p>
+    </div>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
   const { data: session } = useSession();
   const [profileData, setProfileData] = useState<ProfileData>({
-    exists: false,
     hostedCount: 0,
     attendedCount: 0,
-    lastJoinedTimestamp: 0,
-    lastHostedTimestamp: 0,
-    experiencesCount: 0,
     peopleMetCount: 0,
     nftGallery: [],
-    missionProgress: 33,
+    missionProgress: 75,
+    missionLabel: 'Wanderlust Initiate',
+    missionNext: 'Attend 3 more experiences to unlock the "Global Nomad" badge.',
   });
 
   useEffect(() => {
-    const fetchProfileData = async () => {
-      if (!session?.user) {
-        return;
-      }
-
+    const fetchProfile = async () => {
+      if (!session?.user) return;
+      const userAddress = session.user.walletAddress || session.user.id;
+      if (!userAddress) return;
       try {
-        const userAddress = session.user.walletAddress || session.user.id;
-        if (!userAddress) {
-          return;
-        }
-
-        // Fetch profile data from contract using getProfile
         const profile = await getUserProfile(userAddress);
-        console.log('Profile data from getProfile:', profile);
-        
-        // Fetch approved experiences to count unique people met
-        const approvedExperiences = await getUserApprovedExperiences(userAddress);
-        
-        // For now, we'll use mock NFT data
-        // In the future, this could be fetched from the AttendanceNFT contract
+        const approved = await getUserApprovedExperiences(userAddress);
+        const attended = profile.exists ? profile.attendedCount : approved.length;
+        const hosted = profile.exists ? profile.hostedCount : 0;
+
         const mockNFTs: NFTItem[] = [
           {
-            id: '1',
-            title: 'SUMMERTIME',
-            subtitle: '& THE EASY',
+            id: '1', title: 'Alpine Sunrise', date: 'Oct 2023', rarity: 'Rare',
             image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop',
-            timestamp: '3 Hours ago',
           },
           {
-            id: '2',
-            title: 'KEEP ON ROLLING',
-            subtitle: 'STAY HUMBLE',
-            image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop',
-            timestamp: '5 Days ago',
+            id: '2', title: 'Nomad Coffee', date: 'Sep 2023', rarity: 'Common',
+            image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop',
           },
           {
-            id: '3',
-            title: 'SHOOT YOUR SHOT',
-            subtitle: '',
-            image: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=400&h=400&fit=crop',
-            timestamp: '6 Months ago',
-          },
-          {
-            id: '4',
-            title: 'We Are LOVED',
-            subtitle: '',
-            image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=400&h=400&fit=crop',
-            timestamp: '1 Year ago',
+            id: '3', title: 'Coastal Bonfire', date: 'Aug 2023', rarity: 'Epic',
+            image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=400&fit=crop',
           },
         ];
 
-        // Use profile data from getProfile
-        const experiencesCount = profile.exists ? profile.attendedCount : (approvedExperiences.length || 0);
-        const peopleMetCount = profile.exists ? Math.max(profile.attendedCount * 3, 0) : (approvedExperiences.length * 3 || 0);
-
         setProfileData({
-          exists: profile.exists,
-          hostedCount: profile.hostedCount,
-          attendedCount: profile.attendedCount,
-          lastJoinedTimestamp: profile.lastJoinedTimestamp,
-          lastHostedTimestamp: profile.lastHostedTimestamp,
-          experiencesCount,
-          peopleMetCount,
+          hostedCount: hosted,
+          attendedCount: attended,
+          peopleMetCount: Math.max(attended * 7, 0),
           nftGallery: mockNFTs,
-          missionProgress: 33, // This could be calculated based on actual mission data
+          missionProgress: 75,
+          missionLabel: 'Wanderlust Initiate',
+          missionNext: 'Attend 3 more experiences to unlock the "Global Nomad" badge.',
         });
-      } catch (error) {
-        console.error('Error fetching profile data:', error);
-        // Use default values on error
-      }
+      } catch { /* keep defaults */ }
     };
-
-    fetchProfileData();
+    fetchProfile();
   }, [session]);
 
-  const username = session?.user?.username || 'mika_sza';
-  const displayName = session?.user?.name || 'Mikaele Santos';
+  const displayName = session?.user?.name || 'Explorer';
+  const firstName = displayName.split(' ')[0];
+  const avatarUrl = session?.user?.profilePictureUrl;
 
-  // Calculate mission progress percentage for circular progress
-  const progressPercentage = profileData.missionProgress;
-  const circumference = 2 * Math.PI * 45; // radius = 45
-  const offset = circumference - (progressPercentage / 100) * circumference;
+  // Progress ring — r=40, circumference ≈ 251.3
+  const r = 40;
+  const circumference = 2 * Math.PI * r;
+  const ringOffset = circumference - (profileData.missionProgress / 100) * circumference;
+
+  const stats = [
+    { value: profileData.attendedCount, label: 'Attended'   },
+    { value: profileData.hostedCount,   label: 'Hosted'     },
+    { value: profileData.peopleMetCount, label: 'People Met' },
+  ];
 
   return (
-    <Page className="bg-gray-100">
-      <Page.Main className="p-0 pb-28 overflow-y-auto">
-        {/* Profile Header with Gradient */}
-        <div className="relative">
-          {/* Gradient Background */}
-          <div className="h-48 bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500" />
-          
-          {/* White Content Area */}
-          <div className="bg-white rounded-t-3xl -mt-8 relative pt-16 pb-6">
+    <div className="min-h-screen bg-[#fff8f7]">
 
-            {/* Name and Username */}
-            <div className="text-center mt-4 px-6">
-              <h1 className="text-2xl font-bold text-[#1f1f1f] mb-1">{displayName}</h1>
-              <div className="flex items-center justify-center gap-1.5">
-                <span className="text-[#1f1f1f] text-sm font-semibold">X</span>
-                <span className="text-[#1f1f1f] text-sm">@{username}</span>
-              </div>
-            </div>
-
-            {/* Statistics */}
-            <div className="flex items-center justify-center gap-8 mt-6 px-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#db5852]">{profileData.attendedCount}</div>
-                <div className="text-sm text-[#757683] mt-1">Attended</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#db5852]">{profileData.hostedCount}</div>
-                <div className="text-sm text-[#757683] mt-1">Hosted</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#db5852]">{profileData.peopleMetCount}</div>
-                <div className="text-sm text-[#757683] mt-1">People Met</div>
-              </div>
-            </div>
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <header className="flex items-center justify-between px-5 h-16 sticky top-0 z-40 bg-[#fff8f7]">
+        {/* Avatar thumbnail */}
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={displayName}
+            className="w-9 h-9 rounded-full object-cover flex-shrink-0 border border-[#dfbfbc]"
+          />
+        ) : (
+          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 bg-[#f4dddb]">
+            <span className="text-sm font-bold text-[#a7322f]">{firstName.charAt(0)}</span>
           </div>
-        </div>
+        )}
 
-        {/* NFT Gallery Section */}
-        <div className="px-6 py-6 bg-white">
-          <h2 className="text-lg font-bold text-[#1f1f1f] mb-4">NFT Gallery</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {profileData.nftGallery.map((nft) => (
-              <div
-                key={nft.id}
-                className="relative aspect-square rounded-xl overflow-hidden bg-amber-50"
-              >
-                <Image
-                  src={nft.image}
-                  alt={nft.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 50vw, 25vw"
+        {/* Wordmark */}
+        <h2 className="font-quicksand-bold text-xl text-[#251918] tracking-[0.08em]">NOMA</h2>
+
+        {/* Search */}
+        <button className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" aria-label="Search">
+          <svg width="20" height="20" fill="none" stroke="#a7322f" strokeWidth="2" strokeLinecap="round" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+        </button>
+      </header>
+
+      <main className="pb-32">
+
+        {/* ── Profile hero ─────────────────────────────────────────────── */}
+        <section className="pt-8 pb-12 px-5 text-center mb-4 bg-gradient-to-br from-[#0a1c32] to-[#d3a500] rounded-b-3xl">
+          {/* Avatar with gradient ring */}
+          <div className="relative inline-block mt-1 mb-4">
+            <div className="p-0.5 rounded-full bg-gradient-to-br from-[#d3a500] to-[#ffdf92]">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={displayName}
+                  className="w-24 h-24 rounded-full object-cover border-4 border-[#fff8f7]"
                 />
-                {/* NFT Text Overlay */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-3">
-                  <div className="text-center">
-                    <div className="text-white text-xs font-bold mb-0.5 drop-shadow-lg">
-                      {nft.title}
-                    </div>
-                    {nft.subtitle && (
-                      <div className="text-white text-[10px] font-semibold drop-shadow-lg">
-                        {nft.subtitle}
-                      </div>
-                    )}
-                  </div>
+              ) : (
+                <div className="w-24 h-24 rounded-full flex items-center justify-center bg-[#0a1c32] border-4 border-[#fff8f7]">
+                  <span className="font-quicksand-bold text-[32px] text-white">{firstName.charAt(0)}</span>
                 </div>
-                {/* Timestamp */}
-                <div className="absolute bottom-2 left-2 right-2">
-                  <div className="bg-black/30 backdrop-blur-sm rounded-md px-2 py-1">
-                    <span className="text-white text-[9px] font-medium">{nft.timestamp}</span>
-                  </div>
+              )}
+            </div>
+            {/* Edit button */}
+            <button
+              className="absolute bottom-0 right-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm bg-[#fff8f7] border border-[#dfbfbc]"
+              aria-label="Edit profile"
+            >
+              <svg width="13" height="13" fill="none" stroke="#4f5f78" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Name + verified */}
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <h2 className="font-quicksand-bold text-[32px] tracking-[-0.02em] text-white">{displayName}</h2>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" fill="#f4bf00" />
+              <polyline points="8 12 11 15 16 9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+
+          <p className="text-[14px] text-[#fae3e1]">Digital Nomad &amp; Explorer</p>
+        </section>
+
+        {/* ── Stats row ────────────────────────────────────────────────── */}
+        <section className="px-5 mb-6">
+          <div className="flex justify-between items-center text-center rounded-2xl p-4 bg-white border border-[#f4dddb] shadow-sm">
+            {stats.map((stat, i) => (
+              <div key={i} className="flex items-center flex-1">
+                {i > 0 && <div className="h-12 w-px flex-shrink-0 bg-[#dfbfbc]/40" />}
+                <div className="flex-1">
+                  <p className="font-quicksand-bold text-2xl text-[#a7322f]">{stat.value}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#4f5f78]">{stat.label}</p>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* NOMA Mission Section */}
-        <div className="px-6 py-6 bg-white mt-2">
-          <h2 className="text-lg font-bold text-[#1f1f1f] mb-4">NOMA Mission</h2>
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
-              <p className="text-sm text-[#1f1f1f] mb-1">Meet 3 new people through NOMA</p>
-              <p className="text-xs text-[#757683]">Period: November 1st-30th, 2025</p>
-            </div>
-            {/* Circular Progress */}
-            <div className="relative w-24 h-24 flex-shrink-0">
-              <svg className="transform -rotate-90 w-24 h-24">
-                {/* Background circle */}
+        {/* ── NOMA Mission ─────────────────────────────────────────────── */}
+        <section className="px-5 mb-6">
+          <h3 className="font-quicksand-bold text-xl text-[#251918] mb-3">NOMA Mission</h3>
+          <div className="flex items-center gap-5 rounded-2xl p-5 bg-white border border-[#f4dddb] shadow-sm">
+            {/* Progress ring */}
+            <div className="relative w-20 h-20 flex-shrink-0">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r={r} fill="none" stroke="#ffe9e7" strokeWidth="8" />
                 <circle
-                  cx="48"
-                  cy="48"
-                  r="45"
-                  stroke="#e5e7eb"
-                  strokeWidth="6"
-                  fill="none"
-                />
-                {/* Progress circle */}
-                <circle
-                  cx="48"
-                  cy="48"
-                  r="45"
-                  stroke="#fbbf24"
-                  strokeWidth="6"
-                  fill="none"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={offset}
+                  cx="50" cy="50" r={r} fill="none"
+                  stroke="#d3a500" strokeWidth="8"
                   strokeLinecap="round"
-                  className="transition-all duration-300"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={ringOffset}
                 />
               </svg>
-              {/* Percentage text */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-sm font-bold text-[#1f1f1f]">{progressPercentage}%</span>
+                <span className="font-quicksand-bold text-[16px] text-[#d3a500]">
+                  {profileData.missionProgress}%
+                </span>
               </div>
             </div>
+
+            <div className="flex-1 min-w-0">
+              <p className="text-[17px] font-semibold text-[#251918] mb-1">{profileData.missionLabel}</p>
+              <p className="text-[13px] text-[#4f5f78] leading-relaxed">{profileData.missionNext}</p>
+            </div>
           </div>
-        </div>
-      </Page.Main>
-    </Page>
+        </section>
+
+        {/* ── NFT Gallery ──────────────────────────────────────────────── */}
+        <section className="px-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-quicksand-bold text-xl text-[#251918]">My Experience NFTs</h3>
+            <button className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#a7322f]">
+              VIEW ALL
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {profileData.nftGallery.length === 0 ? (
+              <NFTEmptyState />
+            ) : (
+              profileData.nftGallery.map(nft => <NFTCard key={nft.id} nft={nft} />)
+            )}
+          </div>
+        </section>
+
+      </main>
+
+      <Navigation />
+    </div>
   );
 }
-
