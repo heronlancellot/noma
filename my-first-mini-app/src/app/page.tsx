@@ -1,14 +1,18 @@
 'use client';
 
+import { useState, useMemo, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { formatUnits } from 'viem';
+
 import { EventList, Event } from '@/components/EventList';
 import { SearchBar } from '@/components/SearchBar';
 import { Navigation } from '@/components/Navigation';
 import { LoginPage } from '@/components/LoginPage';
-import { useState, useMemo, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useExperiences } from '@/hooks/useExperiences';
-import { formatUnits } from 'viem';
 import { getUserExperienceStatus } from '@/lib/contractUtils';
+
+import { HomeHeader } from './_components/HomeHeader';
+import { FilterSheet } from './_components/FilterSheet';
 
 const guessCategory = (title: string, desc: string): string | undefined => {
   const text = (title + ' ' + desc).toLowerCase();
@@ -23,10 +27,20 @@ const guessCategory = (title: string, desc: string): string | undefined => {
 export default function HomePage() {
   const { data: session, status } = useSession();
   const { experiences, loading, error } = useExperiences();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [eventsWithStatus, setEventsWithStatus] = useState<Event[]>([]);
+  const [activeCategory, setActiveCategory] = useState('All');
 
-  const baseEvents = useMemo(() => {
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterCategory, setFilterCategory] = useState('All');
+  const [filterPrice, setFilterPrice] = useState('All');
+  const [filterRating, setFilterRating] = useState('All');
+  const [pendingCategory, setPendingCategory] = useState('All');
+  const [pendingPrice, setPendingPrice] = useState('All');
+  const [pendingRating, setPendingRating] = useState('All');
+
+  const baseEvents = useMemo<Event[]>(() => {
     return experiences.map((exp): Event => ({
       id: exp.id.toString(),
       title: exp.title,
@@ -51,30 +65,47 @@ export default function HomePage() {
       if (!session?.user || baseEvents.length === 0) { setEventsWithStatus(baseEvents); return; }
       const userAddress = session.user.walletAddress || session.user.id;
       if (!userAddress) { setEventsWithStatus(baseEvents); return; }
-      const promises = baseEvents.map(async (event) => {
-        try {
-          const s = await getUserExperienceStatus(Number(event.id), userAddress);
-          return { ...event, status: s };
-        } catch { return event; }
-      });
-      setEventsWithStatus(await Promise.all(promises));
+      const updated = await Promise.all(
+        baseEvents.map(async (event) => {
+          try {
+            const s = await getUserExperienceStatus(Number(event.id), userAddress);
+            return { ...event, status: s };
+          } catch { return event; }
+        }),
+      );
+      setEventsWithStatus(updated);
     };
     fetchStatuses();
   }, [baseEvents, session]);
 
   const filteredEvents = useMemo(() => {
     const base = eventsWithStatus.length > 0 ? eventsWithStatus : baseEvents;
-    if (!searchQuery.trim()) return base;
-    return base.filter(e =>
-      e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      e.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [eventsWithStatus, baseEvents, searchQuery]);
+    return base.filter((e) => {
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        if (!e.title.toLowerCase().includes(q) && !e.description.toLowerCase().includes(q)) return false;
+      }
+      if (activeCategory !== 'All' && e.category !== activeCategory) return false;
+      if (filterCategory !== 'All' && e.category !== filterCategory) return false;
+      if (filterPrice !== 'All') {
+        const num = e.price === 'Free' ? 0 : parseFloat(e.price.replace('$', ''));
+        if (filterPrice === 'Free' && num !== 0) return false;
+        if (filterPrice === 'Under $50' && (num === 0 || num >= 50)) return false;
+        if (filterPrice === '$50 – $100' && (num < 50 || num > 100)) return false;
+        if (filterPrice === 'Over $100' && num <= 100) return false;
+      }
+      if (filterRating !== 'All') {
+        const minRating = parseFloat(filterRating.replace('+', ''));
+        if (e.rating < minRating) return false;
+      }
+      return true;
+    });
+  }, [eventsWithStatus, baseEvents, searchQuery, activeCategory, filterCategory, filterPrice, filterRating]);
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#fff8f7' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: '#a7322f' }} />
+      <div className="min-h-screen flex items-center justify-center bg-surface">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
   }
@@ -85,59 +116,42 @@ export default function HomePage() {
   const avatarUrl = session?.user?.profilePictureUrl;
 
   return (
-    <div className="min-h-screen flex flex-col pb-24 relative overflow-x-hidden" style={{ backgroundColor: '#fff8f7', fontFamily: 'Poppins, sans-serif' }}>
+    <div className="min-h-screen flex flex-col pb-24 relative overflow-x-hidden bg-surface">
 
-      {/* ── STICKY HEADER ── */}
-      <header
-        className="px-5 pt-8 pb-6 flex justify-between items-center sticky top-0 z-40"
-        style={{ backgroundColor: '#fff8f7' }}
-      >
-        <div>
-          <h1 style={{ fontFamily: 'Quicksand, sans-serif', fontSize: 32, fontWeight: 700, color: '#251918', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
-            Hello, {userName} 👋
-          </h1>
-        </div>
-        <div
-          className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2"
-          style={{ borderColor: '#ffffff', boxShadow: '0px 2px 4px rgba(13,31,53,0.06)' }}
-        >
-          {avatarUrl ? (
-            <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#251918' }}>
-              <span style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>{userName.charAt(0).toUpperCase()}</span>
-            </div>
-          )}
-        </div>
-      </header>
+      <HomeHeader userName={userName} avatarUrl={avatarUrl} />
 
-      {/* ── MAIN ── */}
       <main className="flex-grow flex flex-col px-5 gap-8">
+        <SearchBar
+          onSearch={setSearchQuery}
+          onCategoryChange={setActiveCategory}
+          onFilterClick={() => {
+            setPendingCategory(filterCategory);
+            setPendingPrice(filterPrice);
+            setPendingRating(filterRating);
+            setFilterOpen(true);
+          }}
+        />
 
-        {/* Search + categories */}
-        <SearchBar onSearch={setSearchQuery} onFilterClick={() => {}} />
-
-        {/* Cards */}
         <div className="flex-grow">
           {loading && (
             <div className="flex flex-col items-center py-16 gap-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: '#a7322f' }} />
-              <p style={{ fontSize: 14, color: '#58413f' }}>Loading experiences...</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+              <p className="text-sm text-on-surface-variant">Loading experiences...</p>
             </div>
           )}
 
           {error && (
-            <div className="rounded-xl p-4" style={{ backgroundColor: '#ffdad6', border: '1px solid #ffb3ad' }}>
-              <p style={{ fontWeight: 600, fontSize: 14, color: '#410003' }}>Failed to load experiences</p>
-              <p style={{ fontSize: 13, color: '#93000a', marginTop: 4 }}>{error}</p>
+            <div className="rounded-xl p-4 bg-primary-fixed border border-primary-fixed-dim">
+              <p className="font-semibold text-sm text-[#410003]">Failed to load experiences</p>
+              <p className="text-[13px] text-on-error-container mt-1">{error}</p>
             </div>
           )}
 
           {!loading && !error && filteredEvents.length === 0 && (
             <div className="flex flex-col items-center py-16 gap-3">
-              <span style={{ fontSize: 48 }}>🌤️</span>
-              <p style={{ fontSize: 15, fontWeight: 500, color: '#58413f' }}>No experiences found</p>
-              <p style={{ fontSize: 13, color: '#8b716e' }}>Try a different search or filter</p>
+              <span className="text-5xl">🌤️</span>
+              <p className="text-[15px] font-medium text-on-surface-variant">No experiences found</p>
+              <p className="text-[13px] text-outline">Try a different search or filter</p>
             </div>
           )}
 
@@ -148,6 +162,29 @@ export default function HomePage() {
       </main>
 
       <Navigation />
+
+      {filterOpen && (
+        <FilterSheet
+          pendingCategory={pendingCategory}
+          pendingPrice={pendingPrice}
+          pendingRating={pendingRating}
+          onCategoryChange={setPendingCategory}
+          onPriceChange={setPendingPrice}
+          onRatingChange={setPendingRating}
+          onClear={() => {
+            setPendingCategory('All');
+            setPendingPrice('All');
+            setPendingRating('All');
+          }}
+          onApply={() => {
+            setFilterCategory(pendingCategory);
+            setFilterPrice(pendingPrice);
+            setFilterRating(pendingRating);
+            setFilterOpen(false);
+          }}
+          onClose={() => setFilterOpen(false)}
+        />
+      )}
     </div>
   );
 }

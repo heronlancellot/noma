@@ -1,19 +1,21 @@
 'use client';
 
-import { CreateFormData, ButtonState, InputChange } from './types';
+import { Control, FieldErrors, Controller, useWatch } from 'react-hook-form';
+import { CreateFormData, ButtonState } from './types';
 import { IconBack, IconPhoto, IconRocket } from './icons';
 
 interface Props {
   formData: CreateFormData;
-  agreed: boolean;
-  onAgreedChange: (v: boolean) => void;
+  control: Control<CreateFormData>;
+  errors: FieldErrors<CreateFormData>;
   onPublish: () => void;
   onBack: () => void;
   buttonState: ButtonState;
-  onChange: (e: InputChange) => void;
 }
 
-export default function Step3Review({ formData, agreed, onAgreedChange, onPublish, onBack, buttonState }: Props) {
+export default function Step3Review({ formData, control, errors, onPublish, onBack, buttonState }: Props) {
+  const agreed = useWatch({ control, name: 'agreed' });
+
   return (
     <>
       {/* ── Header ── */}
@@ -61,9 +63,7 @@ export default function Step3Review({ formData, agreed, onAgreedChange, onPublis
                 alt="Cover"
                 className="w-full h-full object-cover"
               />
-              {/* Gradient overlay for readability */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              {/* Category tag */}
               {formData.category && (
                 <span className="absolute top-3 left-3 bg-tertiary-fixed text-on-tertiary-container text-[12px] font-semibold px-3 py-1 rounded-full shadow-sm">
                   {formData.category}
@@ -133,22 +133,34 @@ export default function Step3Review({ formData, agreed, onAgreedChange, onPublis
         </div>
 
         {/* ── Terms ── */}
-        <div className="flex items-start gap-3">
-          <input
-            type="checkbox"
-            id="terms"
-            checked={agreed}
-            onChange={e => onAgreedChange(e.target.checked)}
-            className="w-5 h-5 mt-0.5 rounded border-outline-variant accent-[#a7322f] shrink-0 cursor-pointer"
-          />
-          <label htmlFor="terms" className="text-[13px] text-on-surface-variant leading-relaxed cursor-pointer">
-            I agree to the{' '}
-            <span className="text-primary font-semibold underline decoration-primary/30">
-              Terms &amp; Conditions
-            </span>{' '}
-            and confirm that this experience complies with community guidelines.
-          </label>
-        </div>
+        <Controller
+          name="agreed"
+          control={control}
+          rules={{ required: 'You must agree to the terms to publish' }}
+          render={({ field: { onChange, value } }) => (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={value}
+                  onChange={e => onChange(e.target.checked)}
+                  className="w-5 h-5 mt-0.5 rounded border-outline-variant accent-[#a7322f] shrink-0 cursor-pointer"
+                />
+                <label htmlFor="terms" className="text-[13px] text-on-surface-variant leading-relaxed cursor-pointer">
+                  I agree to the{' '}
+                  <span className="text-primary font-semibold underline decoration-primary/30">
+                    Terms &amp; Conditions
+                  </span>{' '}
+                  and confirm that this experience complies with community guidelines.
+                </label>
+              </div>
+              {errors.agreed && (
+                <p className="text-[12px] text-error font-semibold ml-8">{errors.agreed.message}</p>
+              )}
+            </div>
+          )}
+        />
       </main>
 
       {/* ── Publish button ── */}

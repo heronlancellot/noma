@@ -8,8 +8,7 @@ export interface CreateFormData {
   maxGuests: string;
   price: string;
   coverImage: string;
+  agreed: boolean;
 }
 
 export type ButtonState = 'pending' | 'success' | 'failed' | undefined;
-export type FormErrors = Partial<Record<keyof CreateFormData, string>>;
-export type InputChange = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>;

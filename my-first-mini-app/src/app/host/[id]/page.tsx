@@ -1,9 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import Image from 'next/image';
 import { useState } from 'react';
+import { MiniKit } from '@worldcoin/minikit-js';
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -169,9 +170,29 @@ function ReviewCard({ review }: { review: typeof MOCK_HOST.reviews[0] }) {
 
 export default function HostProfilePage() {
   const router = useRouter();
+  const params = useParams();
+  // params.id is the wallet address (e.g. 0xA762e2268308FFB52Da5D4A5a10188D8ebA96D07)
+  const hostAddress = params.id as string;
+
   const host = MOCK_HOST;
   const hostBg = avatarBgClass(host.name);
-  const initial = host.name.charAt(0).toUpperCase();
+  const initial = hostAddress
+    ? hostAddress.slice(2, 4).toUpperCase()
+    : host.name.charAt(0).toUpperCase();
+
+  const handleMessageHost = () => {
+    // World App deep link to open a conversation with a wallet address.
+    // Inside the World App webview this opens the native chat with that user.
+    const deepLink = `worldapp://chat?address=${hostAddress}`;
+
+    if (MiniKit.isInstalled()) {
+      // We're inside World App — trigger the deep link
+      window.location.href = deepLink;
+    } else {
+      // Fallback for browser preview
+      window.open(deepLink, '_blank');
+    }
+  };
 
   const stats = [
     { label: 'Experiences\nHosted', value: host.stats.experiences },
@@ -215,7 +236,7 @@ export default function HostProfilePage() {
           {/* Avatar */}
           <div className="relative inline-block mb-4">
             <div className="p-1 rounded-full bg-gradient-to-br from-[#f4bf00] to-[#ffdf92]">
-              <div className={`w-28 h-28 rounded-full flex items-center justify-center border-4 border-[#fff8f7] ${hostBg}`}>
+              <div className={`w-28 h-28 rounded-full flex items-center justify-center border-4 border-[#fff8f7] bg-[#a7322f]`}>
                 <span className="font-quicksand-bold text-[36px] text-white">{initial}</span>
               </div>
             </div>
@@ -228,9 +249,11 @@ export default function HostProfilePage() {
             </div>
           </div>
 
-          {/* Name */}
-          <h2 className="font-quicksand-bold text-[32px] tracking-[-0.02em] text-white mb-1">
-            {host.name}
+          {/* Name / Address */}
+          <h2 className="font-quicksand-bold text-[28px] tracking-[-0.02em] text-white mb-1 break-all px-2">
+            {hostAddress
+              ? hostAddress.slice(0, 6) + '...' + hostAddress.slice(-4)
+              : host.name}
           </h2>
 
           {/* Location */}
@@ -243,8 +266,11 @@ export default function HostProfilePage() {
           </p>
 
           {/* Message button */}
-          <button className="bg-noma-primary-container text-white font-bold text-[15px] py-3 px-10 rounded-full shadow-lg hover:opacity-90 transition-opacity active:scale-95 mx-auto block">
-            Message Host
+          <button
+            onClick={handleMessageHost}
+            className="relative z-40 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-sm transition-opacity hover:opacity-90"
+          >
+            Message Hosts
           </button>
         </section>
 
@@ -272,7 +298,7 @@ export default function HostProfilePage() {
         {/* ── About ───────────────────────────────────────────────────────── */}
         <section className="px-5 mb-6">
           <h3 className="font-quicksand-bold text-xl text-[#251918] mb-3">
-            About {host.name.split(' ')[0]}
+            About this host
           </h3>
           <div className="bg-white rounded-2xl shadow-sm border border-[#dfbfbc]/20 p-4">
             <p className="text-sm text-[#58413f] leading-relaxed">{host.bio}</p>
@@ -282,7 +308,7 @@ export default function HostProfilePage() {
         {/* ── Experiences ─────────────────────────────────────────────────── */}
         <section className="px-5 mb-6">
           <h3 className="font-quicksand-bold text-xl text-[#251918] mb-4">
-            Experiences offered by {host.name.split(' ')[0]}
+            Experiences by this host
           </h3>
           <div className="flex flex-col gap-4">
             {host.experiences.map(exp => (

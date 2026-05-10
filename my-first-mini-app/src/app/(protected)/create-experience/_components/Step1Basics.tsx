@@ -1,6 +1,7 @@
 'use client';
 
-import { CreateFormData, FormErrors, InputChange } from './types';
+import { UseFormRegister, Control, FieldErrors, Controller } from 'react-hook-form';
+import { CreateFormData } from './types';
 import { IconClose, IconChevron, IconArrowForward } from './icons';
 import NomajinFace from './NomajinFace';
 
@@ -10,15 +11,15 @@ const Err = ({ msg }: { msg?: string }) =>
   msg ? <p className="text-xs mt-0.5 ml-1 text-error">{msg}</p> : null;
 
 interface Props {
-  formData: CreateFormData;
-  errors: FormErrors;
-  onChange: (e: InputChange) => void;
+  register: UseFormRegister<CreateFormData>;
+  control: Control<CreateFormData>;
+  errors: FieldErrors<CreateFormData>;
   onNext: () => void;
   onClose: () => void;
 }
 
-export default function Step1Basics({ formData, errors, onChange, onNext, onClose }: Props) {
-  const input = `w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-4 py-3 font-body-md text-on-surface placeholder:text-secondary-fixed-dim focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:border-primary transition-shadow outline-none shadow-sm`;
+export default function Step1Basics({ register, control, errors, onNext, onClose }: Props) {
+  const input = `w-full bg-surface-container-lowest border border-[#dfbfbc] rounded-xl px-4 py-3 font-body-md text-on-surface placeholder:text-secondary-fixed-dim focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:border-primary transition-shadow outline-none shadow-sm`;
 
   return (
     <>
@@ -55,15 +56,13 @@ export default function Step1Basics({ formData, errors, onChange, onNext, onClos
             <div className="relative">
               <input
                 id="exp-title"
-                name="title"
                 type="text"
-                value={formData.title}
-                onChange={onChange}
+                {...register('title', { required: 'Required' })}
                 placeholder="e.g., Sunset Yoga on the Beach"
                 className={`${input} ${errors.title ? 'border-error' : ''}`}
               />
             </div>
-            <Err msg={errors.title} />
+            <Err msg={errors.title?.message} />
           </div>
 
           {/* Description */}
@@ -72,38 +71,41 @@ export default function Step1Basics({ formData, errors, onChange, onNext, onClos
             <div className="relative">
               <textarea
                 id="exp-desc"
-                name="description"
                 rows={4}
-                value={formData.description}
-                onChange={onChange}
+                {...register('description', { required: 'Required' })}
                 placeholder="Describe what makes your experience unique..."
                 className={`${input} resize-none ${errors.description ? 'border-error' : ''}`}
               />
             </div>
-            <Err msg={errors.description} />
+            <Err msg={errors.description?.message} />
           </div>
 
           {/* Category */}
           <div className="flex flex-col gap-xs mt-sm">
             <label className="font-label-caps text-on-surface ml-1" htmlFor="exp-cat">Category</label>
             <div className="relative">
-              <select
-                id="exp-cat"
+              <Controller
                 name="category"
-                value={formData.category}
-                onChange={onChange}
-                className={`${input} appearance-none pr-10 ${errors.category ? 'border-error' : ''} ${!formData.category ? 'text-secondary-fixed-dim' : ''}`}
-              >
-                <option value="" disabled>Select a category</option>
-                {CATEGORIES.map(c => (
-                  <option key={c} value={c} className="text-on-surface">{c}</option>
-                ))}
-              </select>
+                control={control}
+                rules={{ required: 'Required' }}
+                render={({ field }) => (
+                  <select
+                    {...field}
+                    id="exp-cat"
+                    className={`${input} appearance-none pr-10 ${errors.category ? 'border-error' : ''} ${!field.value ? 'text-secondary-fixed-dim' : ''}`}
+                  >
+                    <option value="" disabled>Select a category</option>
+                    {CATEGORIES.map(c => (
+                      <option key={c} value={c} className="text-on-surface">{c}</option>
+                    ))}
+                  </select>
+                )}
+              />
               <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-on-surface-variant">
                 <IconChevron />
               </div>
             </div>
-            <Err msg={errors.category} />
+            <Err msg={errors.category?.message} />
           </div>
 
           {/* Nomajin tip card */}

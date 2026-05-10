@@ -4,11 +4,12 @@ import { NOMAD_EXPERIENCE_ADDRESS, NOMAD_EXPERIENCE_ABI } from '@/contracts/cons
 import { MiniKit } from '@worldcoin/minikit-js';
 import { useWaitForTransactionReceipt } from '@worldcoin/minikit-react';
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { createPublicClient, http } from 'viem';
 import { worldchain } from 'viem/chains';
 import { useRouter } from 'next/navigation';
 
-import { CreateFormData, ButtonState, FormErrors, InputChange } from './_components/types';
+import { CreateFormData, ButtonState } from './_components/types';
 import Step1Basics from './_components/Step1Basics';
 import Step2Logistics from './_components/Step2Logistics';
 import Step3Review from './_components/Step3Review';
@@ -18,12 +19,14 @@ export default function CreateExperiencePage() {
   const [step, setStep] = useState(1);
   const [buttonState, setButtonState] = useState<ButtonState>(undefined);
   const [transactionId, setTransactionId] = useState('');
-  const [agreed, setAgreed] = useState(false);
-  const [formData, setFormData] = useState<CreateFormData>({
-    title: '', description: '', category: '', location: '',
-    date: '', duration: '', maxGuests: '', price: '', coverImage: '',
+
+  const { register, control, trigger, watch, getValues, formState: { errors } } = useForm<CreateFormData>({
+    defaultValues: {
+      title: '', description: '', category: '', location: '',
+      date: '', duration: '', maxGuests: '', price: '', coverImage: '',
+      agreed: false,
+    },
   });
-  const [errors, setErrors] = useState<FormErrors>({});
 
   const client = createPublicClient({
     chain: worldchain,
@@ -49,45 +52,23 @@ export default function CreateExperiencePage() {
     }
   }, [isConfirmed, isConfirming, isError, error, transactionId, router]);
 
-  const handleChange = (e: InputChange) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name as keyof CreateFormData]) setErrors(prev => ({ ...prev, [name]: undefined }));
-  };
-
-  const handleDateChange = (value: string) => {
-    setFormData(prev => ({ ...prev, date: value }));
-    if (errors.date) setErrors(prev => ({ ...prev, date: undefined }));
-  };
-
-  const validateStep1 = () => {
-    const e: FormErrors = {};
-    if (!formData.title.trim()) e.title = 'Required';
-    if (!formData.description.trim()) e.description = 'Required';
-    if (!formData.category) e.category = 'Required';
-    setErrors(e);
-    return !Object.keys(e).length;
-  };
-
-  const validateStep2 = () => {
-    const e: FormErrors = {};
-    if (!formData.location.trim()) e.location = 'Required';
-    if (!formData.date) e.date = 'Required';
-    if (!formData.duration) e.duration = 'Required';
-    if (!formData.maxGuests || Number(formData.maxGuests) <= 0) e.maxGuests = 'Required';
-    if (!formData.price) e.price = 'Required';
-    setErrors(e);
-    return !Object.keys(e).length;
-  };
-
-  const handleNext = () => {
-    if (step === 1 && validateStep1()) setStep(2);
-    else if (step === 2 && validateStep2()) setStep(3);
+  const handleNext = async () => {
+    if (step === 1) {
+      const valid = await trigger(['title', 'description', 'category']);
+      if (valid) setStep(2);
+    } else if (step === 2) {
+      const valid = await trigger(['location', 'date', 'duration', 'maxGuests', 'price']);
+      if (valid) setStep(3);
+    }
   };
 
   const handlePublish = async () => {
-    if (!agreed) return;
+    const valid = await trigger(['agreed']);
+    if (!valid) return;
+
     setButtonState('pending');
+    const formData = getValues();
+
     try {
       const startTimestamp = BigInt(Math.floor(new Date(formData.date).getTime() / 1000));
       const durationHours = parseInt(formData.duration) || 2;
@@ -122,23 +103,24 @@ export default function CreateExperiencePage() {
     }
   };
 
+  const formValues = watch();
+
   return (
     <div className="bg-background text-on-surface font-body-md antialiased min-h-screen flex flex-col max-w-[390px] mx-auto relative overflow-hidden">
       {step === 1 && (
         <Step1Basics
-          formData={formData}
+          register={register}
+          control={control}
           errors={errors}
-          onChange={handleChange}
           onNext={handleNext}
           onClose={() => router.push('/')}
         />
       )}
       {step === 2 && (
         <Step2Logistics
-          formData={formData}
+          register={register}
+          control={control}
           errors={errors}
-          onChange={handleChange}
-          onDateChange={handleDateChange}
           onNext={handleNext}
           onBack={() => setStep(1)}
           onClose={() => router.push('/')}
@@ -146,13 +128,12 @@ export default function CreateExperiencePage() {
       )}
       {step === 3 && (
         <Step3Review
-          formData={formData}
-          agreed={agreed}
-          onAgreedChange={setAgreed}
+          formData={formValues}
+          control={control}
+          errors={errors}
           onPublish={handlePublish}
           onBack={() => setStep(2)}
           buttonState={buttonState}
-          onChange={handleChange}
         />
       )}
     </div>

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { CreateFormData, FormErrors, InputChange } from './types';
+import { UseFormRegister, Control, FieldErrors, Controller } from 'react-hook-form';
+import { CreateFormData } from './types';
 import { IconBack, IconClose, IconLocation, IconClock, IconGroup, IconPayments } from './icons';
 
 /* ── data constants ────────────────────────────────────────────── */
@@ -43,7 +44,7 @@ const INPUT_CLASS = 'w-full px-4 py-3.5 bg-transparent border-none text-[16px] t
 const Err = ({ msg }: { msg?: string }) =>
   msg ? <p className="text-[12px] text-error font-semibold px-4 pb-3 -mt-1">{msg}</p> : null;
 
-/* ── InlineSelect: invisible native <select> + custom text display ── */
+/* ── InlineSelect ── */
 function InlineSelect({
   value, onChange, emptyText, children, style,
 }: {
@@ -55,7 +56,6 @@ function InlineSelect({
 }) {
   return (
     <span className="relative inline-block" style={style}>
-      {/* Real select — invisible, covers the text for tap target */}
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
@@ -65,7 +65,6 @@ function InlineSelect({
         <option value="">{emptyText}</option>
         {children}
       </select>
-      {/* Visual text */}
       <span className={`text-[16px] ${value ? 'text-on-surface' : 'text-secondary/35'}`}>
         {value || emptyText}
       </span>
@@ -73,7 +72,6 @@ function InlineSelect({
   );
 }
 
-/* ── CalendarIcon (inline, no import needed) ── */
 function CalendarIcon({ filled }: { filled?: boolean }) {
   return (
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
@@ -87,26 +85,15 @@ function CalendarIcon({ filled }: { filled?: boolean }) {
   );
 }
 
-interface Props {
-  formData: CreateFormData;
-  errors: FormErrors;
-  onChange: (e: InputChange) => void;
-  onDateChange: (iso: string) => void;
-  onNext: () => void;
-  onBack: () => void;
-  onClose: () => void;
-}
+/* ── DatePickerInput — controlled via RHF Controller ── */
+function DatePickerInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [dp, setDp] = useState<DateParts>(() => parseDateParts(value));
 
-export default function Step2Logistics({
-  formData, errors, onChange, onDateChange, onNext, onBack, onClose
-}: Props) {
-  const [dp, setDp] = useState<DateParts>(() => parseDateParts(formData.date));
-
-  const setPart = (field: keyof DateParts, value: string) => {
-    const next = { ...dp, [field]: value };
+  const setPart = (field: keyof DateParts, newValue: string) => {
+    const next = { ...dp, [field]: newValue };
     setDp(next);
     if (next.year && next.month && next.day && next.hour && next.minute) {
-      onDateChange(`${next.year}-${next.month}-${next.day}T${next.hour}:${next.minute}`);
+      onChange(`${next.year}-${next.month}-${next.day}T${next.hour}:${next.minute}`);
     }
   };
 
@@ -115,6 +102,78 @@ export default function Step2Logistics({
   const ampm = h24 >= 12 ? 'PM' : 'AM';
   const h12  = h24 % 12 || 12;
 
+  return (
+    <>
+      <div className={LABEL_ROW}>
+        <CalendarIcon filled={Boolean(dateReady)} />
+        <span className={`${LABEL_TEXT} ${dateReady ? 'text-primary' : ''}`}>Date &amp; Time</span>
+      </div>
+      <div className={DIVIDER} />
+
+      <div className="px-4 py-3.5 flex items-center gap-1 flex-wrap">
+        <InlineSelect value={dp.day} onChange={v => setPart('day', v)} emptyText="dd" style={{ minWidth: 26 }}>
+          {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
+        </InlineSelect>
+
+        <span className="text-secondary/35 text-[16px]">/</span>
+
+        <InlineSelect value={dp.month} onChange={v => setPart('month', v)} emptyText="mmm" style={{ minWidth: 36 }}>
+          {MONTHS.map(m => <option key={m.v} value={m.v}>{m.l}</option>)}
+        </InlineSelect>
+
+        <span className="text-secondary/35 text-[16px]">/</span>
+
+        <InlineSelect value={dp.year} onChange={v => setPart('year', v)} emptyText="yyyy" style={{ minWidth: 44 }}>
+          {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+        </InlineSelect>
+
+        <span className="text-secondary/25 text-[16px] mx-1">,</span>
+
+        <InlineSelect value={dp.hour} onChange={v => setPart('hour', v)} emptyText="--" style={{ minWidth: 24 }}>
+          {HOURS.map(h => <option key={h} value={h}>{h}</option>)}
+        </InlineSelect>
+
+        <span className="text-secondary/35 text-[16px]">:</span>
+
+        <InlineSelect value={dp.minute} onChange={v => setPart('minute', v)} emptyText="--" style={{ minWidth: 24 }}>
+          {MINUTES.map(m => <option key={m} value={m}>{m}</option>)}
+        </InlineSelect>
+
+        <div className="ml-auto">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="var(--color-secondary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+      </div>
+
+      {dateReady && (
+        <>
+          <div className={DIVIDER} />
+          <p className="px-4 py-2.5 text-[13px] font-semibold text-primary">
+            {MONTH_FULL[dp.month]} {parseInt(dp.day)}, {dp.year}
+            {dp.hour && dp.minute && ` · ${h12}:${dp.minute} ${ampm}`}
+          </p>
+        </>
+      )}
+    </>
+  );
+}
+
+/* ── Props ── */
+interface Props {
+  register: UseFormRegister<CreateFormData>;
+  control: Control<CreateFormData>;
+  errors: FieldErrors<CreateFormData>;
+  onNext: () => void;
+  onBack: () => void;
+  onClose: () => void;
+}
+
+export default function Step2Logistics({ register, control, errors, onNext, onBack, onClose }: Props) {
   return (
     <>
       {/* ── Header ── */}
@@ -139,7 +198,6 @@ export default function Step2Logistics({
       {/* ── Scroll area ── */}
       <main className="flex-grow overflow-y-auto px-4 pt-6 pb-36 flex flex-col gap-4">
 
-        {/* Step + title */}
         <div className="mb-2">
           <p className="text-[12px] font-bold text-primary mb-2 tracking-wide">STEP 2 OF 3</p>
           <h1 className="font-h1 text-on-surface leading-tight">Details &amp; Logistics</h1>
@@ -154,77 +212,25 @@ export default function Step2Logistics({
           </div>
           <div className={DIVIDER} />
           <input
-            name="location"
             type="text"
-            value={formData.location}
-            onChange={onChange}
+            {...register('location', { required: 'Required' })}
             placeholder="Search places..."
             className={INPUT_CLASS}
           />
-          <Err msg={errors.location} />
+          <Err msg={errors.location?.message} />
         </div>
 
         {/* ── Date & Time ── */}
         <div className={`${CARD} ${errors.date ? 'border-error' : ''}`} style={CARD_SHADOW}>
-          <div className={LABEL_ROW}>
-            <CalendarIcon filled={Boolean(dateReady)} />
-            <span className={`${LABEL_TEXT} ${dateReady ? 'text-primary' : ''}`}>Date &amp; Time</span>
-          </div>
-          <div className={DIVIDER} />
-
-          {/* Single-row inline selects — mimics datetime-local appearance */}
-          <div className="px-4 py-3.5 flex items-center gap-1 flex-wrap">
-            <InlineSelect value={dp.day} onChange={v => setPart('day', v)} emptyText="dd" style={{ minWidth: 26 }}>
-              {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
-            </InlineSelect>
-
-            <span className="text-secondary/35 text-[16px]">/</span>
-
-            <InlineSelect value={dp.month} onChange={v => setPart('month', v)} emptyText="mmm" style={{ minWidth: 36 }}>
-              {MONTHS.map(m => <option key={m.v} value={m.v}>{m.l}</option>)}
-            </InlineSelect>
-
-            <span className="text-secondary/35 text-[16px]">/</span>
-
-            <InlineSelect value={dp.year} onChange={v => setPart('year', v)} emptyText="yyyy" style={{ minWidth: 44 }}>
-              {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-            </InlineSelect>
-
-            <span className="text-secondary/25 text-[16px] mx-1">,</span>
-
-            <InlineSelect value={dp.hour} onChange={v => setPart('hour', v)} emptyText="--" style={{ minWidth: 24 }}>
-              {HOURS.map(h => <option key={h} value={h}>{h}</option>)}
-            </InlineSelect>
-
-            <span className="text-secondary/35 text-[16px]">:</span>
-
-            <InlineSelect value={dp.minute} onChange={v => setPart('minute', v)} emptyText="--" style={{ minWidth: 24 }}>
-              {MINUTES.map(m => <option key={m} value={m}>{m}</option>)}
-            </InlineSelect>
-
-            {/* Calendar corner icon (mimics native datetime-local) */}
-            <div className="ml-auto">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                stroke="var(--color-secondary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
-              </svg>
-            </div>
-          </div>
-
-          {/* Preview */}
-          {dateReady && (
-            <>
-              <div className={DIVIDER} />
-              <p className="px-4 py-2.5 text-[13px] font-semibold text-primary">
-                {MONTH_FULL[dp.month]} {parseInt(dp.day)}, {dp.year}
-                {dp.hour && dp.minute && ` · ${h12}:${dp.minute} ${ampm}`}
-              </p>
-            </>
-          )}
-          <Err msg={errors.date} />
+          <Controller
+            name="date"
+            control={control}
+            rules={{ required: 'Required' }}
+            render={({ field: { onChange, value } }) => (
+              <DatePickerInput value={value} onChange={onChange} />
+            )}
+          />
+          <Err msg={errors.date?.message} />
         </div>
 
         {/* ── Duration + Max Guests ── */}
@@ -236,24 +242,29 @@ export default function Step2Logistics({
             </div>
             <div className={DIVIDER} />
             <div className="relative px-1">
-              <select
+              <Controller
                 name="duration"
-                value={formData.duration}
-                onChange={onChange}
-                className={`w-full px-4 py-3.5 bg-transparent border-none text-[16px] appearance-none cursor-pointer focus:outline-none pr-9 ${
-                  formData.duration ? 'text-on-surface' : 'text-secondary/35'
-                }`}
-              >
-                <option value="" disabled>Select...</option>
-                {DURATIONS.map(d => <option key={d} value={d}>{d}</option>)}
-              </select>
+                control={control}
+                rules={{ required: 'Required' }}
+                render={({ field }) => (
+                  <select
+                    {...field}
+                    className={`w-full px-4 py-3.5 bg-transparent border-none text-[16px] appearance-none cursor-pointer focus:outline-none pr-9 ${
+                      field.value ? 'text-on-surface' : 'text-secondary/35'
+                    }`}
+                  >
+                    <option value="" disabled>Select...</option>
+                    {DURATIONS.map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                )}
+              />
               <svg className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-secondary"
                 width="14" height="14" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 12 15 18 9"/>
               </svg>
             </div>
-            <Err msg={errors.duration} />
+            <Err msg={errors.duration?.message} />
           </div>
 
           <div className={CARD} style={CARD_SHADOW}>
@@ -263,15 +274,13 @@ export default function Step2Logistics({
             </div>
             <div className={DIVIDER} />
             <input
-              name="maxGuests"
               type="number"
-              value={formData.maxGuests}
-              onChange={onChange}
+              {...register('maxGuests', { required: 'Required', min: { value: 1, message: 'Required' } })}
               placeholder="e.g. 10"
               min="1"
               className={INPUT_CLASS}
             />
-            <Err msg={errors.maxGuests} />
+            <Err msg={errors.maxGuests?.message} />
           </div>
         </div>
 
@@ -285,17 +294,15 @@ export default function Step2Logistics({
           <div className="flex items-center px-4 py-3.5">
             <span className="text-[16px] text-on-surface mr-2">$</span>
             <input
-              name="price"
               type="number"
-              value={formData.price}
-              onChange={onChange}
+              {...register('price', { required: 'Required' })}
               placeholder="0.00"
               min="0"
               step="0.01"
               className="flex-1 bg-transparent border-none text-[16px] text-on-surface placeholder:text-secondary/35 focus:ring-0 focus:outline-none"
             />
           </div>
-          <Err msg={errors.price} />
+          <Err msg={errors.price?.message} />
         </div>
 
       </main>
