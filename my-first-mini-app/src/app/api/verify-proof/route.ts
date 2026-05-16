@@ -1,9 +1,16 @@
-import {
-  ISuccessResult,
-  IVerifyResponse,
-  verifyCloudProof,
-} from '@worldcoin/minikit-js';
 import { NextRequest, NextResponse } from 'next/server';
+
+interface ISuccessResult {
+  nullifier_hash: string;
+  merkle_root: string;
+  proof: string;
+  verification_level: string;
+}
+
+interface IVerifyResponse {
+  success: boolean;
+  detail?: string;
+}
 
 interface IRequestPayload {
   payload: ISuccessResult;
@@ -20,12 +27,21 @@ export async function POST(req: NextRequest) {
   const { payload, action, signal } = (await req.json()) as IRequestPayload;
   const app_id = process.env.NEXT_PUBLIC_APP_ID as `app_${string}`;
 
-  const verifyRes = (await verifyCloudProof(
-    payload,
-    app_id,
-    action,
-    signal,
-  )) as IVerifyResponse; // Wrapper on this
+  const verifyRes = (await fetch(
+    `https://developer.worldcoin.org/api/v2/verify/${app_id}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nullifier_hash: payload.nullifier_hash,
+        merkle_root: payload.merkle_root,
+        proof: payload.proof,
+        verification_level: payload.verification_level,
+        action,
+        signal: signal ?? '',
+      }),
+    },
+  ).then((r) => r.json())) as IVerifyResponse;
 
   if (verifyRes.success) {
     // This is where you should perform backend actions if the verification succeeds
