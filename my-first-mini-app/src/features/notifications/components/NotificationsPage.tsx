@@ -22,14 +22,7 @@ interface Notification {
   timeLabel: string;
 }
 
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .map(w => w[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
+
 
 export function NotificationsPage() {
   const { data: session } = useSession();

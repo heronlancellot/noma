@@ -74,8 +74,6 @@ export const TransactionMock = () => {
     setTransactionId('');
     setWhichButton('usePermit2');
     setButtonState('pending');
-    const address = (await MiniKit.getUserByUsername('alex')).walletAddress;
-
     try {
       const permit2Data = encodeFunctionData({
         abi: NOMAD_EXPERIENCE_ABI,

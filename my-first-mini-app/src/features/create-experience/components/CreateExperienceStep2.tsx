@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { UseFormRegister, Control, FieldErrors, Controller } from 'react-hook-form';
 import { CreateFormData } from '@/features/create-experience/types';
 import { MapPin, Clock, Users, CreditCard, Calendar, ChevronDown } from 'lucide-react';

@@ -9,8 +9,10 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        // Default (alias for primary — required by shadcn internals)
+        default: "bg-noma-btn text-on-primary shadow-md hover:opacity-90",
         // Primary CTA — coral red (noma-btn)
-        primary: "bg-noma-btn text-white shadow-md hover:opacity-90",
+        primary: "bg-noma-btn text-on-primary shadow-md hover:opacity-90",
         // Outline — bordered
         outline: "border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-low",
         // Secondary — text-only, no bg
@@ -31,6 +33,8 @@ const buttonVariants = cva(
         xl: "h-14 w-full px-8 text-base rounded-2xl",
         icon: "size-10 rounded-full",
         "icon-sm": "size-8 rounded-full",
+        "icon-xs": "size-6 rounded-full",
+        "icon-lg": "size-11 rounded-full",
       },
     },
     defaultVariants: {

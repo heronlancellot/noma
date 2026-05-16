@@ -5,7 +5,7 @@ import { Navigation } from '@/components/Navigation';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { MiniKit } from '@worldcoin/minikit-js';
-import { ChevronLeft, MoreVertical, MapPin, Star, ImageIcon, Clock } from 'lucide-react';
+import { ChevronLeft, MoreVertical, MapPin, ImageIcon, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getExperiencesByCreator, getUserProfile } from '@/lib/contractUtils';
 import { formatEther } from 'viem';
