@@ -174,7 +174,7 @@ export function NotificationsPage() {
                       <span className="text-xs text-secondary whitespace-nowrap ml-2">{n.timeLabel}</span>
                     )}
                   </div>
-                  <p className="font-body-sm text-on-background leading-snug">
+                  <p className="font-body-sm text-on-surface leading-snug">
                     You published{' '}
                     <span className="font-semibold text-primary-container">{n.experienceName}</span>
                   </p>
@@ -209,7 +209,7 @@ export function NotificationsPage() {
                       <span className="text-xs text-secondary whitespace-nowrap ml-2">{n.timeLabel}</span>
                     )}
                   </div>
-                  <p className="font-body-sm text-on-background leading-snug">
+                  <p className="font-body-sm text-on-surface leading-snug">
                     Your request for{' '}
                     <span className="font-semibold text-primary-container">{n.experienceName}</span>
                     {' '}was approved

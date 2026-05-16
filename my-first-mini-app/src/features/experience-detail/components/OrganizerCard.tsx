@@ -5,14 +5,14 @@ import { Button } from '@/components/ui/button';
 interface OrganizerCardProps {
   name: string;
   peopleMet: number;
-  avatarBgColor: string;
+  avatarBgClass: string;
   initial: string;
   onViewProfile: () => void;
   onMessage: (e: React.MouseEvent) => void;
 }
 
 export function OrganizerCard({
-  name, peopleMet, avatarBgColor, initial, onViewProfile, onMessage,
+  name, peopleMet, avatarBgClass, initial, onViewProfile, onMessage,
 }: OrganizerCardProps) {
   return (
     <div
@@ -30,10 +30,9 @@ export function OrganizerCard({
       <div className="flex items-center gap-4">
         {/* Avatar */}
         <div
-          className="w-14 h-14 rounded-full overflow-hidden border-2 border-primary-container p-[2px] flex-shrink-0 flex items-center justify-center"
-          style={{ backgroundColor: avatarBgColor }}
+          className={`w-14 h-14 rounded-full overflow-hidden border-2 border-primary-container p-[2px] flex-shrink-0 flex items-center justify-center ${avatarBgClass}`}
         >
-          <span className="text-xl font-bold text-white">{initial}</span>
+          <span className="font-h3 text-on-primary">{initial}</span>
         </div>
 
         <div>

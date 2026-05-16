@@ -110,7 +110,7 @@ export const EventCard = ({
           <Heart
             size={20}
             fill={hearted ? 'currentColor' : 'none'}
-            className="text-white"
+            className="text-on-primary"
             strokeWidth={2}
           />
         </Button>
@@ -138,7 +138,7 @@ export const EventCard = ({
             <Image src={organizerAvatar} alt={organizer} className="w-8 h-8 rounded-full object-cover flex-shrink-0"/>
           ) : (
             <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${avatarClass(organizer)}`}>
-              <span className="text-xs font-bold text-white">{initial}</span>
+              <span className="text-xs font-bold text-on-primary">{initial}</span>
             </div>
           )}
           <span className="font-body-md text-on-surface-variant">{organizerShort}</span>

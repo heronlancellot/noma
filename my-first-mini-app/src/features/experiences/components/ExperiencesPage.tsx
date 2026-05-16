@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { formatUnits } from 'viem';
 import { ChevronLeft, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Navigation } from '@/components/Navigation';
 import { useExperiences } from '@/features/experiences/hooks/useExperiences';
 import { guessCategory } from '@/features/experiences/utils';
@@ -55,12 +56,12 @@ export function ExperiencesPage() {
         </div>
         <div className="flex items-center gap-3 bg-surface-container-lowest border border-outline-variant rounded-xl px-4 shadow-sm">
           <Search size={18} className="text-on-surface-variant" strokeWidth={2} />
-          <input
+          <Input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search experiences..."
-            className="flex-1 bg-transparent focus:outline-none py-3.5 font-body-sm text-on-surface placeholder:text-outline"
+            className="flex-1 bg-transparent focus:outline-none border-none shadow-none py-3.5 font-body-sm text-on-surface placeholder:text-outline"
           />
           {search && (
             <Button variant="ghost" size="icon-sm" onClick={() => setSearch('')} className="p-0">

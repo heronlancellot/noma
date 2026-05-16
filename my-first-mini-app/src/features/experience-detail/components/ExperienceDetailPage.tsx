@@ -13,8 +13,8 @@ import { MapPlaceholder } from '@/features/experience-detail/components/MapPlace
 import { BookingCard } from '@/features/experience-detail/components/BookingCard';
 import { useExperienceDetail, useJoinExperience } from '@/features/experience-detail/hooks';
 
-const AVATAR_COLORS = ['#7c3aed', '#0891b2', '#d97706', '#a7322f', '#059669', '#db2777'];
-const avatarColor = (str: string) => AVATAR_COLORS[str.charCodeAt(0) % AVATAR_COLORS.length];
+const AVATAR_CLASSES = ['bg-primary', 'bg-secondary', 'bg-tertiary-container', 'bg-primary-container', 'bg-on-surface', 'bg-noma-btn'];
+const avatarClass = (str: string) => AVATAR_CLASSES[str.charCodeAt(0) % AVATAR_CLASSES.length];
 const TAGS = ['Adventure', 'Nature', 'Community'];
 
 export function ExperienceDetailPage() {
@@ -85,7 +85,7 @@ export function ExperienceDetailPage() {
     );
   }
 
-  const bgColor = avatarColor(experience.organizer.name);
+  const bgClass = avatarClass(experience.organizer.name);
   const initial = experience.organizer.name.charAt(0).toUpperCase();
 
   return (
@@ -112,7 +112,7 @@ export function ExperienceDetailPage() {
         <OrganizerCard
           name={experience.organizer.name}
           peopleMet={experience.organizer.peopleMet}
-          avatarBgColor={bgColor}
+          avatarBgClass={bgClass}
           initial={initial}
           onViewProfile={() => router.push(`/host/${experience.creator}`)}
           onMessage={(e) => {

@@ -170,7 +170,7 @@ export function HostProfilePage() {
           <div className="relative inline-block mb-4">
             <div className="p-1 rounded-full bg-gradient-to-br from-tertiary-fixed-dim to-tertiary-fixed">
               <div className="w-28 h-28 rounded-full flex items-center justify-center border-4 border-surface bg-primary">
-                <span className="font-quicksand-bold font-h1 text-on-primary">{initial}</span>
+                <span className="font-h1 text-on-primary">{initial}</span>
               </div>
             </div>
             {/* Verified badge */}

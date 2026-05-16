@@ -130,7 +130,7 @@ export default function CreateExperienceStep2({ register, control, errors, onNex
           <p className={LABEL}>Price per Person</p>
           <div className={INPUT_ROW}>
             <CreditCard size={18} className="text-on-surface-variant flex-shrink-0" />
-            <span className="text-base text-on-surface">$</span>
+            <span className="font-body-md text-on-surface">$</span>
             <Input
               type="number"
               {...register('price', { required: 'Required' })}

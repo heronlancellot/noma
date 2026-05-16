@@ -97,17 +97,17 @@ export function HeroSection({
 
       {/* Title + location + rating — pinned to bottom */}
       <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col gap-2 text-background">
-        <h1 className="text-4xl font-quicksand-bold leading-tight tracking-tight drop-shadow-sm">
+        <h1 className="font-h1 leading-tight tracking-tight drop-shadow-sm">
           {title}
         </h1>
         <div className="flex items-center gap-4 mt-1 text-background/95">
           <div className="flex items-center gap-1.5">
             <MapPin size={18} className="text-background/90" strokeWidth={2} />
-            <span className="text-lg leading-relaxed">{location}</span>
+            <span className="font-body-md leading-relaxed">{location}</span>
           </div>
           <div className="flex items-center gap-1.5 ml-auto rounded-full px-3 py-1 bg-black/30 backdrop-blur-sm">
             <Star size={16} fill="currentColor" stroke="currentColor" className="text-tertiary-fixed-dim" strokeWidth={1} />
-            <span className="text-base font-semibold">{rating.toFixed(1)}</span>
+            <span className="font-body-md font-semibold">{rating.toFixed(1)}</span>
           </div>
         </div>
       </div>

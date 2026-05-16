@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { twMerge } from 'tailwind-merge';
 
 const CATEGORIES = ['All', 'Hiking', 'Surf', 'Yoga', 'Social', 'Cultura'];
@@ -35,12 +36,12 @@ export const SearchBar = ({ onSearch, onFilterClick, onCategoryChange }: SearchB
         {/* Input container */}
         <div className="flex-grow flex items-center gap-3 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 bg-surface-container-lowest border border-outline-variant rounded-xl px-4 shadow-card">
           <Search size={20} className="flex-shrink-0 text-on-surface-variant" />
-          <input
+          <Input
             type="text"
             value={searchQuery}
             onChange={handleInputChange}
             placeholder="Find your next adventure..."
-            className="flex-1 bg-transparent focus:outline-none text-on-surface font-body-sm py-3.5"
+            className="flex-1 bg-transparent focus:outline-none border-none shadow-none text-on-surface font-body-sm py-3.5"
           />
         </div>
 

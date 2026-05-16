@@ -66,25 +66,25 @@ export function CompactCard({ id, title, price, rating, image, location, categor
           <Heart
             size={14}
             fill={hearted ? 'currentColor' : 'none'}
-            className="text-white"
+            className="text-on-primary"
             strokeWidth={2}
           />
         </Button>
         {catClass && category && (
-          <span className={`absolute top-2.5 left-2.5 text-[9px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${catClass}`}>
+          <span className={`absolute top-2.5 left-2.5 text-xs font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${catClass}`}>
             {category}
           </span>
         )}
         <div className="absolute bottom-0 left-0 right-0 px-3 pb-3 flex items-end justify-between">
-          <span className="font-quicksand-bold text-lg text-white drop-shadow-md">{price}</span>
+          <span className="font-quicksand-bold font-h3 text-on-primary drop-shadow-md">{price}</span>
           <div className="flex items-center gap-1">
             <Star size={12} fill="currentColor" stroke="currentColor" strokeWidth={1} className="text-tertiary-fixed-dim" />
-            <span className="text-xs font-semibold text-white drop-shadow-md">{rating.toFixed(1)}</span>
+            <span className="text-xs font-semibold text-on-primary drop-shadow-md">{rating.toFixed(1)}</span>
           </div>
         </div>
       </div>
       <div className="px-3 py-3 flex flex-col gap-1">
-        <h3 className="line-clamp-2 leading-snug font-quicksand-bold font-body-sm text-on-surface">{title}</h3>
+        <h3 className="line-clamp-2 leading-snug font-quicksand-bold text-sm text-on-surface">{title}</h3>
         {location && (
           <div className="flex items-center gap-1 text-outline">
             <MapPin size={11} strokeWidth={2} />

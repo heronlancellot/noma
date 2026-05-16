@@ -15,7 +15,7 @@ export function HomeHeader({ userName, avatarUrl }: HomeHeaderProps) {
           <Image src={avatarUrl} alt={userName} width={48} height={48} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-on-surface">
-            <span className="text-surface text-base font-bold">
+            <span className="text-surface font-body-md font-bold">
               {userName.charAt(0).toUpperCase()}
             </span>
           </div>

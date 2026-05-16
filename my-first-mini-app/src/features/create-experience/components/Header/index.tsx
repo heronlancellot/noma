@@ -1,4 +1,5 @@
 import { X, ChevronLeft } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 type Props =
   | { step: 1; onClose: () => void }
@@ -13,13 +14,15 @@ export function CreateExperienceHeader(props: Props) {
     1: (
       <header className="px-container-padding pt-12 pb-md sticky top-0 z-10 bg-surface">
         <div className="flex items-center justify-between mb-lg">
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
             aria-label="Close"
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low hover:bg-surface-container transition-colors text-on-surface"
+            className="w-10 h-10 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface"
           >
             <X size={20} />
-          </button>
+          </Button>
           <div className="font-label-caps text-secondary">CREATE</div>
           <div className="w-10" />
         </div>
@@ -35,21 +38,25 @@ export function CreateExperienceHeader(props: Props) {
     2: (
       <header className="px-container-padding pt-12 pb-md sticky top-0 z-10 bg-surface">
         <div className="flex items-center justify-between mb-lg">
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onBack}
             aria-label="Go back"
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low hover:bg-surface-container transition-colors text-on-surface"
+            className="w-10 h-10 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface"
           >
             <ChevronLeft size={20} />
-          </button>
+          </Button>
           <div className="font-label-caps text-secondary">CREATE</div>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
             aria-label="Close"
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low hover:bg-surface-container transition-colors text-on-surface"
+            className="w-10 h-10 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface"
           >
             <X size={20} />
-          </button>
+          </Button>
         </div>
         <div className="w-full bg-surface-variant rounded-full h-2 mb-md overflow-hidden">
           <div className="bg-primary h-2 rounded-full w-2/3 transition-all duration-500 ease-in-out" />
@@ -63,13 +70,15 @@ export function CreateExperienceHeader(props: Props) {
     3: (
       <header className="px-container-padding pt-12 pb-md sticky top-0 z-10 bg-surface">
         <div className="flex items-center justify-between mb-lg">
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onBack}
             aria-label="Go back"
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low hover:bg-surface-container transition-colors text-on-surface"
+            className="w-10 h-10 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface"
           >
             <ChevronLeft size={20} />
-          </button>
+          </Button>
           <div className="font-label-caps text-secondary">CREATE</div>
           <div className="w-10" />
         </div>

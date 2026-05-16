@@ -64,7 +64,7 @@ export const LoginPage = () => {
 
       {/* NOMA badge */}
       <div className="absolute bottom-6 left-6 w-10 h-10 rounded-full bg-noma-btn flex items-center justify-center border-2 border-foreground shadow-md">
-        <span className="font-h3 text-white font-bold leading-none">N</span>
+        <span className="font-h3 text-on-primary font-bold leading-none">N</span>
         <div className="absolute -top-1 -right-1 w-3 h-3 bg-surface-container-lowest rounded-full border border-foreground" />
       </div>
     </div>

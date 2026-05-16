@@ -180,11 +180,11 @@ export function ProfilePage() {
           />
         ) : (
           <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 bg-surface-container-highest">
-            <span className="text-sm font-bold text-primary">{firstName.charAt(0)}</span>
+            <span className="font-body-sm font-bold text-primary">{firstName.charAt(0)}</span>
           </div>
         )}
 
-        <span className="font-quicksand-bold text-xl text-on-surface tracking-widest">NOMA</span>
+        <span className="font-h3 text-on-surface tracking-widest">NOMA</span>
 
         <Button variant="ghost" size="icon-sm" aria-label="Search">
           <Search size={20} strokeWidth={2} className="text-primary" />
@@ -268,7 +268,7 @@ export function ProfilePage() {
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-body-md font-quicksand-bold text-tertiary-container">
+                <span className="font-quicksand-bold text-tertiary-container">
                   {profileData.missionProgress}%
                 </span>
               </div>

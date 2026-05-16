@@ -20,7 +20,7 @@ export const UserInfo = () => {
         />
       ) : (
         <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center">
-          <span className="font-quicksand-bold text-xl text-on-primary">
+          <span className="font-h3 text-on-primary">
             {(username || 'U').charAt(0).toUpperCase()}
           </span>
         </div>

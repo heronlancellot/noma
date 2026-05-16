@@ -64,7 +64,7 @@ function NavItem({ item, isActive, onClick, iconOverride }: NavItemProps) {
           aria-label={label}
           className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg bg-noma-btn"
         >
-          <Icon size={26} className="text-white" strokeWidth={2.5} />
+          <Icon size={26} className="text-on-primary" strokeWidth={2.5} />
         </button>
         <span className={`text-[10px] font-semibold mt-0.5 ${labelClass}`}>{label}</span>
       </div>

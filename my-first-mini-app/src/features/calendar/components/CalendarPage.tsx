@@ -111,7 +111,7 @@ export function CalendarPage() {
         </div>
 
         {/* NOMA wordmark */}
-        <h2 className="font-h3 tracking-widest">NOMA</h2>
+        <span className="font-h3 tracking-widest">NOMA</span>
 
         {/* Search icon */}
         <Button variant="ghost" size="icon-sm" aria-label="Search">

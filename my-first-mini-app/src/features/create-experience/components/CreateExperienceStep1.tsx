@@ -6,6 +6,7 @@ import { ChevronsUpDown } from 'lucide-react';
 import NomajinFace from './NomajinFace';
 import { CreateExperienceHeader } from '@/features/create-experience/components/Header';
 import { CreateExperienceFooter } from '@/features/create-experience/components/Footer';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { FormError } from '@/components/ui/form-error';
 
@@ -30,12 +31,12 @@ export default function CreateExperienceStep1({ register, control, errors, onNex
           {/* Title */}
           <div className="flex flex-col gap-sm">
             <label className="font-body-md font-bold text-on-surface ml-1" htmlFor="exp-title">Title</label>
-            <input
+            <Input
               id="exp-title"
               type="text"
               {...register('title', { required: 'Required' })}
               placeholder="e.g., Sunset Yoga on the Beach"
-              className={`w-full bg-surface-container-lowest border border-outline-variant rounded-lg !p-3 font-body-md text-on-surface placeholder:text-secondary-fixed-dim focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all ${errors.title ? 'border-error' : ''}`}
+              className={`w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 font-body-md text-on-surface placeholder:text-secondary-fixed-dim focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all ${errors.title ? 'border-error' : ''}`}
             />
             <FormError msg={errors.title?.message} />
           </div>
@@ -48,7 +49,7 @@ export default function CreateExperienceStep1({ register, control, errors, onNex
               rows={4}
               {...register('description', { required: 'Required' })}
               placeholder="Describe what makes your experience unique..."
-              className={`w-full bg-surface-container-lowest border border-outline-variant  rounded-lg !p-3  font-body-md text-on-surface placeholder:text-secondary-fixed-dim focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all resize-none ${errors.description ? 'border-error' : ''}`}
+              className={`w-full bg-surface-container-lowest border border-outline-variant  rounded-lg p-3  font-body-md text-on-surface placeholder:text-secondary-fixed-dim focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all resize-none ${errors.description ? 'border-error' : ''}`}
             />
             <FormError msg={errors.description?.message} />
           </div>
@@ -65,7 +66,7 @@ export default function CreateExperienceStep1({ register, control, errors, onNex
                   <select
                     {...field}
                     id="exp-cat"
-                    className={`w-full bg-surface-container-lowest border border-outline-variant rounded-lg !p-3 font-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all appearance-none pr-10 ${errors.category ? 'border-error' : ''} ${!field.value ? 'text-secondary-fixed-dim' : ''}`}
+                    className={`w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 font-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all appearance-none pr-10 ${errors.category ? 'border-error' : ''} ${!field.value ? 'text-secondary-fixed-dim' : ''}`}
                   >
                     <option value="" disabled>Select a category</option>
                     {CATEGORIES.map(c => (
