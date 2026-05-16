@@ -1,14 +1,13 @@
 @import 'tailwindcss';
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #fafaf8;
-  --foreground: #0d1f35;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-poppins);
+  --font-sans: var(--font-sans);
   --font-bold: var(--font-quicksand);
 
   /* ── Full design system color palette ──────────────────────────── */
@@ -62,6 +61,15 @@
   --spacing-base:               8px;
   --spacing-xs:                 4px;
 
+  /* ── Missing brand colors (added to cover real usage in components) ─────── */
+  --color-nav-inactive:       #9ca3af;   /* gray-400 — inactive nav icons & labels   */
+  --color-brand-gold:         #f5c000;   /* NOMAJIN gold — active indicator dots      */
+  --color-on-tertiary-fixed:  #241a00;   /* dark text on tertiary-fixed (#ffdf92) bg  */
+
+  /* ── Custom shadow tokens ────────────────────────────────────────────────── */
+  --shadow-card:    0px 2px 4px rgba(13, 31, 53, 0.06);
+  --shadow-card-sm: 0px 1px 2px rgba(13, 31, 53, 0.04);
+
   /* ── Legacy noma-* aliases (keeps existing pages working) ──────── */
   --color-noma-primary:                  #a7322f;
   --color-noma-primary-container:        #c84a45;
@@ -78,6 +86,41 @@
   --color-noma-btn:                      #db5852;
   --color-noma-secondary-container:      #cfe1fe;
   --color-noma-on-secondary-container:   #53647d;
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 html,
@@ -153,4 +196,98 @@ body {
 
 .font-quicksand {
   font-family: var(--font-quicksand), sans-serif;
+}
+
+@utility noma-splash-gradient {
+  background: linear-gradient(135deg, #ed7b31 0%, #fbbd30 40%, #a4b150 100%);
+}
+
+/* ── Button background fix ───────────────────────────────────────────────────
+   The UI kit's globals.css ships un-layered CSS: `button { background-color: transparent }`.
+   Un-layered CSS beats Tailwind v4's @layer utilities, so bg-* classes fail on <button>.
+   These un-layered class rules (specificity 0,1,0 > element 0,0,1) restore the tokens. ── */
+.bg-noma-btn          { background-color: #db5852; }
+.bg-primary           { background-color: #a7322f; }
+.bg-primary-container { background-color: #c84a45; }
+
+:root {
+  /* ── NOMA Design Tokens mapped to shadcn CSS variables ─────────── */
+  --background:              #fafaf8;   /* brand background           */
+  --foreground:              #251918;   /* on-surface                 */
+  --card:                    #ffffff;   /* surface-container-lowest   */
+  --card-foreground:         #251918;   /* on-surface                 */
+  --popover:                 #ffffff;   /* surface-container-lowest   */
+  --popover-foreground:      #251918;   /* on-surface                 */
+  --primary:                 #a7322f;   /* NOMA primary red           */
+  --primary-foreground:      #ffffff;   /* on-primary                 */
+  --secondary:               #ffe9e7;   /* surface-container (subtle) */
+  --secondary-foreground:    #251918;   /* on-surface                 */
+  --muted:                   #fff0ef;   /* surface-container-low      */
+  --muted-foreground:        #58413f;   /* on-surface-variant         */
+  --accent:                  #ffdf92;   /* tertiary-fixed (gold)      */
+  --accent-foreground:       #241a00;   /* on-tertiary-fixed          */
+  --destructive:             #ba1a1a;   /* error                      */
+  --border:                  #dfbfbc;   /* outline-variant            */
+  --input:                   #dfbfbc;   /* outline-variant            */
+  --ring:                    #a7322f;   /* primary (focus rings)      */
+  --radius:                  0.75rem;   /* 12px — NOMA rounded style  */
+  --chart-1:                 #a7322f;   /* primary                    */
+  --chart-2:                 #4f5f78;   /* secondary                  */
+  --chart-3:                 #d3a500;   /* tertiary-container         */
+  --chart-4:                 #ffdf92;   /* tertiary-fixed             */
+  --chart-5:                 #dfbfbc;   /* outline-variant            */
+  --sidebar:                 #fff8f7;   /* surface                    */
+  --sidebar-foreground:      #251918;   /* on-surface                 */
+  --sidebar-primary:         #a7322f;   /* primary                    */
+  --sidebar-primary-foreground: #ffffff;/* on-primary                 */
+  --sidebar-accent:          #ffe9e7;   /* surface-container          */
+  --sidebar-accent-foreground: #251918; /* on-surface                 */
+  --sidebar-border:          #dfbfbc;   /* outline-variant            */
+  --sidebar-ring:            #a7322f;   /* primary                    */
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }

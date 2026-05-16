@@ -3,7 +3,7 @@ import { worldchain } from 'viem/chains';
 import { NOMAD_EXPERIENCE_ADDRESS, NOMAD_EXPERIENCE_ABI, NOMA_PROFILE_HUB_ADDRESS, NOMA_PROFILE_HUB_ABI } from '@/contracts/constants';
 
 // Create a singleton public client
-const publicClient = createPublicClient({
+export const publicClient = createPublicClient({
   chain: worldchain,
   transport: http('https://worldchain-mainnet.g.alchemy.com/public'),
 });
@@ -223,7 +223,7 @@ export async function getUserRequestedExperiences(userAddress: string) {
 /**
  * Check user status for an experience (approved, requested, or none)
  */
-export async function getUserExperienceStatus(
+export async function getUserExperienceStatusRequest(
   experienceId: number,
   userAddress: string
 ): Promise<'approved' | 'requested' | 'none'> {

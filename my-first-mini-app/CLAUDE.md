@@ -22,34 +22,103 @@ NOMA é um marketplace descentralizado de experiências rodando dentro do **Worl
 
 ```
 src/
-├── app/
-│   ├── (protected)/         # Páginas que exigem autenticação (World ID)
-│   │   ├── layout.tsx       # Layout com guard de auth
+├── app/                          # Next.js routing APENAS (page.tsx, layout.tsx, api/)
+│   ├── (protected)/
+│   │   ├── layout.tsx
+│   │   ├── calendar/page.tsx     # thin wrapper → @/features/calendar
+│   │   ├── create-experience/page.tsx  # thin wrapper → @/features/create-experience
 │   │   ├── home/page.tsx
-│   │   ├── calendar/page.tsx
-│   │   ├── profile/page.tsx
-│   │   └── create-experience/
-│   │       ├── page.tsx
-│   │       └── _components/ # Componentes LOCAIS desta rota
+│   │   └── profile/page.tsx     # thin wrapper → @/features/profile
+│   ├── api/                     # Rotas de API (inalterado)
 │   ├── experience/[id]/
-│   │   ├── page.tsx
-│   │   └── _components/     # Componentes locais da rota
-│   ├── host/[id]/page.tsx
-│   ├── _components/         # Componentes locais do app root
+│   │   ├── confirmation/page.tsx  # thin wrapper → @/features/experience-detail
+│   │   ├── manage/page.tsx        # thin wrapper → @/features/experience-detail
+│   │   └── page.tsx               # thin wrapper → @/features/experience-detail
+│   ├── experiences/page.tsx       # thin wrapper → @/features/experiences
+│   ├── host/[id]/page.tsx         # thin wrapper → @/features/profile
+│   ├── notifications/page.tsx     # thin wrapper → @/features/notifications
+│   ├── report/page.tsx            # thin wrapper → @/features/report
 │   ├── layout.tsx
-│   └── globals.css          # FONTE DA VERDADE para tokens de design
-├── components/              # Componentes COMPARTILHADOS entre rotas
-│   └── [NomeComponente]/
-│       └── index.tsx
-├── hooks/                   # Custom hooks React
-├── lib/                     # Utilitários, contratos, helpers
-├── providers/               # Providers React (MiniKit, Eruda, etc.)
-└── auth/                    # Configuração next-auth
+│   ├── globals.css               # FONTE DA VERDADE para tokens de design
+│   └── page.tsx                  # thin wrapper → @/features/experiences
+│
+├── features/                     # TODA a lógica de produto vive aqui
+│   ├── experiences/              # Home + listagem + filtros
+│   │   ├── components/           # EventCard, EventList, FilterSheet, HomeHeader, HomePage, ExperiencesPage
+│   │   ├── hooks/                # useExperiences, useFilterSheet
+│   │   ├── utils.ts              # guessCategory
+│   │   └── index.ts              # barrel público da feature
+│   ├── experience-detail/        # Detalhe, confirmação e gestão
+│   │   ├── components/           # AboutSection, BookingCard, HeroSection, etc.
+│   │   └── index.ts
+│   ├── create-experience/        # Fluxo de criação
+│   │   ├── components/           # Step1-3, NomajinFace, icons, CreateExperiencePage
+│   │   ├── types/                # Tipos do formulário
+│   │   └── index.ts
+│   ├── auth/                     # Autenticação World ID
+│   │   ├── components/           # AuthButton, LoginPage, Verify
+│   │   └── index.ts
+│   ├── payments/                 # Pagamentos on-chain
+│   │   ├── components/           # Pay, Transaction, TransactionMock
+│   │   └── index.ts
+│   ├── profile/                  # Perfil do usuário e do host
+│   │   ├── components/           # ProfilePage, HostProfilePage, ContractDebugger, UserInfo, ViewPermissions
+│   │   └── index.ts
+│   ├── calendar/
+│   │   ├── components/           # CalendarPage
+│   │   └── index.ts
+│   ├── notifications/
+│   │   ├── components/           # NotificationsPage
+│   │   └── index.ts
+│   └── report/
+│       ├── components/           # ReportPage
+│       └── index.ts
+│
+├── components/                   # UI compartilhada usada em 2+ features
+│   ├── Navigation/
+│   ├── PageLayout/
+│   ├── SearchBar/
+│   └── TagChip/
+│
+├── lib/                          # Utilitários sem UI, usados em 2+ features
+├── providers/                    # Providers React app-wide (inalterado)
+├── auth/                         # Configuração next-auth (inalterado)
+├── contracts/                    # Constantes e ABIs on-chain (inalterado)
+└── assets/                       # Arquivos estáticos (inalterado)
 ```
 
 **Regra de localização:**
-- UI usada em 1 rota apenas → `src/app/[rota]/_components/`
-- UI usada em 2+ rotas → `src/components/[Nome]/index.tsx`
+
+| Localização | Critério |
+|---|---|
+| `features/[f]/components/` | componente usado **somente** nessa feature |
+| `features/[f]/hooks/` | hook usado **somente** nessa feature |
+| `features/[f]/types/` | tipos usados **somente** nessa feature |
+| `src/components/` | componente usado em **2+ features** |
+| `src/hooks/` | hook usado em **2+ features** |
+| `src/lib/` | utilitário sem UI, usado em **2+ features** |
+
+**Padrão de barrel exports (3 níveis):**
+```ts
+// Nível 1 — features/[f]/components/index.ts
+export { ComponenteA } from './ComponenteA';
+export { ComponenteB } from './ComponenteB';
+
+// Nível 2 — features/[f]/hooks/index.ts  (se houver hooks)
+export { useAlgo } from './useAlgo';
+
+// Nível 3 — features/[f]/index.ts  (ponto de entrada público)
+export * from './components';
+export * from './hooks';   // se houver
+export * from './types';   // se houver
+```
+
+**Padrão de página thin (app/):
+```tsx
+// src/app/experience/[id]/page.tsx
+import { ExperienceDetailPage } from '@/features/experience-detail';
+export default ExperienceDetailPage;
+```
 
 ---
 
@@ -168,10 +237,9 @@ Usar as **utilities** definidas em `globals.css`. Nunca `text-[Npx]` para tamanh
 export function PrimaryButton({ children, ...props }) { ... }
 ```
 
-**Componentes que devem existir (se não existirem, criar):**
+**Componentes compartilhados que devem existir em `src/components/` (se não existirem, criar):**
 - `src/components/PrimaryButton/` — botão CTA vermelho padrão
 - `src/components/SecondaryButton/` — botão outlined
-- `src/components/EventCard/` — card de experiência (já existe)
 - `src/components/Navigation/` — bottom nav (já existe)
 - `src/components/TagChip/` — chip de categoria (já existe)
 - `src/components/SearchBar/` — barra de busca (já existe)
@@ -214,7 +282,7 @@ Preferir tokens de espaçamento do design system quando disponíveis:
 
 - Usar `@worldcoin/mini-apps-ui-kit-react` para componentes de UI base quando disponível
 - Não criar implementações customizadas de primitivos que o UI Kit já oferece
-- Para ícones, usar `iconoir-react`
+- Para ícones, usar `lucide-react`
 
 ---
 
@@ -247,15 +315,23 @@ export function ExampleCard({ title, description }: ExampleCardProps) {
 }
 ```
 
-### Estrutura padrão de página autenticada
+### Estrutura padrão de página autenticada (thin wrapper)
 
 ```tsx
 // src/app/(protected)/example/page.tsx
+import { ExamplePage } from '@/features/example';
+export default ExamplePage;
+```
+
+### Estrutura padrão de componente de página (dentro da feature)
+
+```tsx
+// src/features/example/components/ExamplePage.tsx
 'use client';
 
 import { Navigation } from '@/components/Navigation';
 
-export default function ExamplePage() {
+export function ExamplePage() {
   return (
     <div className="min-h-screen bg-surface flex flex-col pb-24">
       <main className="flex-grow flex flex-col px-container-padding gap-md">

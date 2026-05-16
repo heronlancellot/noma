@@ -1,9 +1,7 @@
 import { hashNonce } from '@/auth/wallet/client-helpers';
-import {
-  MiniAppWalletAuthSuccessPayload,
-  MiniKit,
-  verifySiweMessage,
-} from '@worldcoin/minikit-js';
+import { MiniKit } from '@worldcoin/minikit-js';
+import { WalletAuthResult } from '@worldcoin/minikit-js/commands';
+import { verifySiweMessage } from '@worldcoin/minikit-js/siwe';
 import NextAuth, { type DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
@@ -55,7 +53,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        const finalPayload: MiniAppWalletAuthSuccessPayload =
+        const finalPayload: WalletAuthResult =
           JSON.parse(finalPayloadJson);
         const result = await verifySiweMessage(finalPayload, nonce);
 
