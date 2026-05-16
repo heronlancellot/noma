@@ -12,7 +12,7 @@ export function HomeHeader({ userName, avatarUrl }: HomeHeaderProps) {
 
       <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-white shadow-sm">
         {avatarUrl ? (
-          <Image src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
+          <Image src={avatarUrl} alt={userName} width={48} height={48} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-on-surface">
             <span className="text-white text-base font-bold">

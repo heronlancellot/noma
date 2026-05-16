@@ -46,14 +46,14 @@ export function ExperienceConfirmationPage() {
 
   if (loading) {
     return (
-      <div className="bg-background min-h-screen flex items-center justify-center">
+      <div className="bg-surface min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
   }
 
   return (
-    <div className="bg-background min-h-screen flex flex-col items-center px-5 pt-16 pb-12">
+    <div className="bg-surface min-h-screen flex flex-col items-center px-5 pt-16 pb-12">
       {/* Mascot */}
       <div className="mb-5">
         <Image src="/nomajin-happy.png" alt="NOMAJIN" width={96} height={96} />

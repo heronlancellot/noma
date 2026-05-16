@@ -10,7 +10,7 @@ import { useWaitForTransactionReceipt } from '@worldcoin/minikit-react';
 import Image from 'next/image';
 import { MapPin, QrCode, Check, X } from 'lucide-react';
 import { Page } from '@/components/PageLayout';
-import { TopBar } from '@worldcoin/mini-apps-ui-kit-react';
+import { ChevronLeft } from 'lucide-react';
 import { Navigation } from '@/components/Navigation';
 import { publicClient, getJoinRequests, getParticipants } from '@/lib/contractUtils';
 import { NOMAD_EXPERIENCE_ADDRESS, NOMAD_EXPERIENCE_ABI } from '@/contracts/constants';
@@ -144,7 +144,10 @@ export function ExperienceManagePage() {
     return (
       <Page>
         <Page.Header className="p-0">
-          <TopBar title="Manage Experience" />
+          <div className="flex items-center gap-3 px-4 py-3 bg-surface border-b border-outline-variant">
+            <button onClick={() => router.back()} className="p-1"><ChevronLeft size={22} className="text-primary" /></button>
+            <h1 className="font-h3 text-on-surface">Manage Experience</h1>
+          </div>
         </Page.Header>
         <Page.Main className="flex items-center justify-center">
           <div className="text-center">
@@ -160,7 +163,10 @@ export function ExperienceManagePage() {
     return (
       <Page>
         <Page.Header className="p-0">
-          <TopBar title="Manage Experience" />
+          <div className="flex items-center gap-3 px-4 py-3 bg-surface border-b border-outline-variant">
+            <button onClick={() => router.back()} className="p-1"><ChevronLeft size={22} className="text-primary" /></button>
+            <h1 className="font-h3 text-on-surface">Manage Experience</h1>
+          </div>
         </Page.Header>
         <Page.Main className="flex items-center justify-center">
           <p className="font-body-sm text-on-surface-variant">You are not the creator of this experience</p>

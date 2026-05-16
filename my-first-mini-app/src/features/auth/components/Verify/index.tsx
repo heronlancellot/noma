@@ -1,15 +1,14 @@
 'use client';
-import { Button, LiveFeedback } from '@worldcoin/mini-apps-ui-kit-react';
+import { Button } from '@/components/ui/button';
 import { MiniKit } from '@worldcoin/minikit-js';
 import { useState } from 'react';
+import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 
 enum VerificationLevel {
   Device = 'device',
   Orb = 'orb',
 }
 
-// MiniKit.verify was removed in newer minikit-js versions.
-// This interface bridges the old template API until the verification flow is updated.
 interface MiniKitWithVerify {
   verify(options: {
     action: string;
@@ -18,17 +17,10 @@ interface MiniKitWithVerify {
 }
 const MiniKitVerify = MiniKit as unknown as MiniKitWithVerify;
 
-/**
- * This component is an example of how to use World ID in Mini Apps
- * Minikit commands must be used on client components
- * It's critical you verify the proof on the server side
- * Read More: https://docs.world.org/mini-apps/commands/verify#verifying-the-proof
- */
 export const Verify = () => {
   const [buttonState, setButtonState] = useState<
     'pending' | 'success' | 'failed' | undefined
   >(undefined);
-
   const [whichVerification, setWhichVerification] = useState<VerificationLevel>(
     VerificationLevel.Device,
   );
@@ -37,11 +29,9 @@ export const Verify = () => {
     setButtonState('pending');
     setWhichVerification(verificationLevel);
     const result = await MiniKitVerify.verify({
-      action: 'test-action', // Make sure to create this in the developer portal -> incognito actions
+      action: 'test-action',
       verification_level: verificationLevel,
     });
-    console.log(result.finalPayload);
-    // Verify the proof
     const response = await fetch('/api/verify-proof', {
       method: 'POST',
       body: JSON.stringify({
@@ -53,65 +43,41 @@ export const Verify = () => {
     const data = await response.json();
     if (data.verifyRes.success) {
       setButtonState('success');
-      // Normally you'd do something here since the user is verified
-      // Here we'll just do nothing
     } else {
       setButtonState('failed');
-
-      // Reset the button state after 3 seconds
-      setTimeout(() => {
-        setButtonState(undefined);
-      }, 2000);
+      setTimeout(() => setButtonState(undefined), 2000);
     }
+  };
+
+  const getButtonContent = (level: VerificationLevel, label: string) => {
+    if (whichVerification !== level || !buttonState) return label;
+    if (buttonState === 'pending') return <><Loader2 className="animate-spin" size={18} />Verifying...</>;
+    if (buttonState === 'success') return <><CheckCircle size={18} />Verified</>;
+    if (buttonState === 'failed') return <><XCircle size={18} />Failed</>;
+    return label;
   };
 
   return (
     <div className="grid w-full gap-4">
-      <p className="text-lg font-semibold">Verify</p>
-      <LiveFeedback
-        label={{
-          failed: 'Failed to verify',
-          pending: 'Verifying',
-          success: 'Verified',
-        }}
-        state={
-          whichVerification === VerificationLevel.Device
-            ? buttonState
-            : undefined
-        }
+      <p className="font-h3 text-on-surface">Verify</p>
+      <Button
+        onClick={() => onClickVerify(VerificationLevel.Device)}
+        disabled={buttonState === 'pending'}
+        size="lg"
+        variant="outline"
         className="w-full"
       >
-        <Button
-          onClick={() => onClickVerify(VerificationLevel.Device)}
-          disabled={buttonState === 'pending'}
-          size="lg"
-          variant="tertiary"
-          className="w-full"
-        >
-          Verify (Device)
-        </Button>
-      </LiveFeedback>
-      <LiveFeedback
-        label={{
-          failed: 'Failed to verify',
-          pending: 'Verifying',
-          success: 'Verified',
-        }}
-        state={
-          whichVerification === VerificationLevel.Orb ? buttonState : undefined
-        }
+        {getButtonContent(VerificationLevel.Device, 'Verify (Device)')}
+      </Button>
+      <Button
+        onClick={() => onClickVerify(VerificationLevel.Orb)}
+        disabled={buttonState === 'pending'}
+        size="lg"
+        variant="primary"
         className="w-full"
       >
-        <Button
-          onClick={() => onClickVerify(VerificationLevel.Orb)}
-          disabled={buttonState === 'pending'}
-          size="lg"
-          variant="primary"
-          className="w-full"
-        >
-          Verify (Orb)
-        </Button>
-      </LiveFeedback>
+        {getButtonContent(VerificationLevel.Orb, 'Verify (Orb)')}
+      </Button>
     </div>
   );
 };

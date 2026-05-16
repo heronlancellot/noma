@@ -101,7 +101,7 @@ export function HomePage() {
 
   if (!session) return <LoginPage />;
 
-  const userName = session?.user?.name?.split(' ')[0] ?? 'Explorer';
+  const userName = session?.user?.username || session?.user?.name?.split(' ')[0] || 'Explorer';
   const avatarUrl = session?.user?.profilePictureUrl;
 
   return (

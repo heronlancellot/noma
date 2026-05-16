@@ -1,29 +1,38 @@
 'use client';
-import { CircularIcon, Marble } from '@worldcoin/mini-apps-ui-kit-react';
 import { CheckCircle2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
-/**
- * Minikit is only available on client side. Thus user info needs to be rendered on client side.
- * UserInfo component displays user information including profile picture, username, and verification status.
- * It uses the Marble component from the mini-apps-ui-kit-react library to display the profile picture.
- * The component is client-side rendered.
- */
 export const UserInfo = () => {
-  // Fetching the user state client side
   const session = useSession();
+  const avatarUrl = session?.data?.user?.profilePictureUrl;
+  const username = session?.data?.user?.username;
 
   return (
-    <div className="flex flex-row items-center justify-start gap-4 rounded-xl w-full border-2 border-gray-200 p-4">
-      <Marble src={session?.data?.user?.profilePictureUrl} className="w-14" />
+    <div className="flex flex-row items-center justify-start gap-4 rounded-2xl w-full border border-outline-variant/30 p-4 bg-surface-container-lowest shadow-sm">
+      {avatarUrl ? (
+        <Image
+          src={avatarUrl}
+          alt={username || 'User'}
+          width={56}
+          height={56}
+          className="w-14 h-14 rounded-full object-cover"
+        />
+      ) : (
+        <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center">
+          <span className="font-quicksand-bold text-xl text-white">
+            {(username || 'U').charAt(0).toUpperCase()}
+          </span>
+        </div>
+      )}
       <div className="flex flex-row items-center justify-center">
-        <span className="text-lg font-semibold capitalize">
-          {session?.data?.user?.username}
+        <span className="font-h3 text-on-surface capitalize">
+          {username}
         </span>
-        {session?.data?.user?.profilePictureUrl && (
-          <CircularIcon size="sm" className="ml-0">
-            <CheckCircle2 size={16} className="text-blue-600" fill="currentColor" />
-          </CircularIcon>
+        {avatarUrl && (
+          <div className="ml-1.5 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+            <CheckCircle2 size={14} className="text-white" />
+          </div>
         )}
       </div>
     </div>

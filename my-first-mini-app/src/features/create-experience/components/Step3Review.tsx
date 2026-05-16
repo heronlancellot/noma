@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { Control, FieldErrors, Controller, useWatch } from 'react-hook-form';
 import { CreateFormData, ButtonState } from '@/features/create-experience/types';
-import { ImageIcon, MapPin, Clock } from 'lucide-react';
+import { ImageIcon, MapPin, Clock, X } from 'lucide-react';
 import { CreateExperienceHeader } from '@/features/create-experience/components/Header';
 import { CreateExperienceFooter } from '@/features/create-experience/components/Footer';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -21,10 +22,102 @@ interface Props {
 
 export default function Step3Review({ formData, control, errors, onPublish, onBack, onCoverUpload, buttonState }: Props) {
   const agreed = useWatch({ control, name: 'agreed' });
+  const [showTerms, setShowTerms] = useState(false);
 
   return (
     <>
       <CreateExperienceHeader step={3} onBack={onBack} />
+
+      {/* Terms & Conditions Modal */}
+      {showTerms && (
+        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/40" onClick={() => setShowTerms(false)}>
+          <div
+            className="bg-surface w-full max-w-[390px] rounded-t-3xl max-h-[85vh] flex flex-col animate-in slide-in-from-bottom duration-300"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-outline-variant/50" />
+            </div>
+
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 pb-4 pt-2">
+              <h2 className="font-h2 text-on-surface">Terms &amp; Conditions</h2>
+              <button
+                onClick={() => setShowTerms(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-low"
+              >
+                <X size={20} className="text-on-surface-variant" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-5 pb-8 text-on-surface-variant">
+              <div className="flex flex-col gap-5">
+                <section>
+                  <h3 className="font-h3 text-on-surface mb-2">1. Experience Creation</h3>
+                  <p className="font-body-sm leading-relaxed">
+                    By creating an experience on NOMA, you agree to provide accurate information about your offering,
+                    including description, location, pricing, and availability. You are responsible for delivering the
+                    experience as described.
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="font-h3 text-on-surface mb-2">2. Community Guidelines</h3>
+                  <p className="font-body-sm leading-relaxed">
+                    All experiences must comply with local laws and regulations. Experiences involving illegal activities,
+                    discrimination, or unsafe conditions are strictly prohibited. NOMA reserves the right to remove
+                    any experience that violates these guidelines.
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="font-h3 text-on-surface mb-2">3. Payments &amp; Fees</h3>
+                  <p className="font-body-sm leading-relaxed">
+                    Payments are processed on-chain via World Chain. Hosts receive payment after the experience is
+                    completed and confirmed. NOMA may charge a service fee on each transaction.
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="font-h3 text-on-surface mb-2">4. Cancellation Policy</h3>
+                  <p className="font-body-sm leading-relaxed">
+                    Hosts may cancel an experience before it starts. Guests who have already joined will be notified
+                    and refunded. Repeated cancellations may affect your host reputation.
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="font-h3 text-on-surface mb-2">5. Liability</h3>
+                  <p className="font-body-sm leading-relaxed">
+                    NOMA acts as a platform connecting hosts and guests. The host is solely responsible for the safety
+                    and quality of the experience. Participants join at their own risk.
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="font-h3 text-on-surface mb-2">6. Privacy</h3>
+                  <p className="font-body-sm leading-relaxed">
+                    Your wallet address and public profile information are visible to other users. NOMA uses World ID
+                    for identity verification and does not store personal identification documents.
+                  </p>
+                </section>
+              </div>
+            </div>
+
+            {/* Close button */}
+            <div className="px-5 pb-6 pt-3 border-t border-outline-variant/20">
+              <button
+                onClick={() => setShowTerms(false)}
+                className="w-full py-3.5 rounded-2xl font-body-md font-bold text-white bg-noma-btn active:opacity-80 transition-opacity"
+              >
+                I Understand
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="flex-1 overflow-y-auto px-container-padding py-lg pb-32 flex flex-col gap-stack-gap">
 
@@ -130,9 +223,13 @@ export default function Step3Review({ formData, control, errors, onPublish, onBa
                 />
                 <label htmlFor="terms" className="text-sm text-on-surface-variant leading-relaxed cursor-pointer">
                   I agree to the{' '}
-                  <span className="text-primary font-semibold underline decoration-primary/30">
+                  <button
+                    type="button"
+                    onClick={() => setShowTerms(true)}
+                    className="text-primary font-semibold underline decoration-primary/30 inline"
+                  >
                     Terms &amp; Conditions
-                  </span>{' '}
+                  </button>{' '}
                   and confirm that this experience complies with community guidelines.
                 </label>
               </div>

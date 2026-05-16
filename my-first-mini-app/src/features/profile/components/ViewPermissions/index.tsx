@@ -1,14 +1,8 @@
 'use client';
 
-import { ListItem } from '@worldcoin/mini-apps-ui-kit-react';
 import { MiniKit } from '@worldcoin/minikit-js';
 import { useMiniKit } from '@worldcoin/minikit-js/minikit-provider';
 import { useEffect, useState } from 'react';
-/**
- * This component is an example of how to view the permissions of a user
- * It's critical you use Minikit commands on client components
- * Read More: https://docs.world.org/mini-apps/commands/permissions
- */
 
 export const ViewPermissions = () => {
   const [permissions, setPermissions] = useState<Record<string, boolean>>({});
@@ -18,18 +12,13 @@ export const ViewPermissions = () => {
     const fetchPermissions = async () => {
       if (isInstalled) {
         try {
-          // You can also fetch this by grabbing from user
-          // MiniKit.user.permissions
           const permissions = await MiniKit.getPermissions();
           if (permissions?.data?.status === 'success') {
             setPermissions((permissions?.data as { permissions?: Record<string, boolean> })?.permissions || {});
-            console.log('permissions', permissions);
           }
         } catch (error) {
           console.error('Failed to fetch permissions:', error);
         }
-      } else {
-        console.log('MiniKit is not installed');
       }
     };
     fetchPermissions();
@@ -37,14 +26,18 @@ export const ViewPermissions = () => {
 
   return (
     <div className="grid w-full gap-4">
-      <p className="text-lg font-semibold">Permissions</p>
+      <p className="font-h3 text-on-surface">Permissions</p>
       {permissions &&
         Object.entries(permissions).map(([permission, value]) => (
-          <ListItem
+          <div
             key={permission}
-            description={`Enabled: ${value}`}
-            label={permission}
-          />
+            className="flex items-center justify-between rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-4 shadow-sm"
+          >
+            <div>
+              <p className="font-body-md font-semibold text-on-surface">{permission}</p>
+              <p className="font-body-sm text-secondary">Enabled: {String(value)}</p>
+            </div>
+          </div>
         ))}
     </div>
   );

@@ -13,6 +13,7 @@ import { CreateFormData, ButtonState } from '@/features/create-experience/types'
 import CreateExperienceStep1 from '@/features/create-experience/components/CreateExperienceStep1';
 import CreateExperienceStep2 from '@/features/create-experience/components/CreateExperienceStep2';
 import Step3Review from '@/features/create-experience/components/Step3Review';
+import PublishConfirmation from '@/features/create-experience/components/PublishConfirmation';
 
 export function CreateExperiencePage() {
   const router = useRouter();
@@ -43,7 +44,7 @@ export function CreateExperiencePage() {
     if (transactionId && !isConfirming) {
       if (isConfirmed) {
         setButtonState('success');
-        setTimeout(() => router.push('/'), 2000);
+        setStep(4);
       } else if (isError) {
         console.error('Transaction failed:', error);
         setButtonState('failed');
@@ -157,6 +158,9 @@ export function CreateExperiencePage() {
           onCoverUpload={handleCoverUpload}
           buttonState={buttonState}
         />
+      )}
+      {step === 4 && (
+        <PublishConfirmation formData={formValues} />
       )}
     </div>
   );

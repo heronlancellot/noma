@@ -221,6 +221,47 @@ export async function getUserRequestedExperiences(userAddress: string) {
 }
 
 /**
+ * Fetch all experiences created by a specific address
+ */
+export async function getExperiencesByCreator(creatorAddress: string) {
+  try {
+    const count = (await publicClient.readContract({
+      address: NOMAD_EXPERIENCE_ADDRESS,
+      abi: NOMAD_EXPERIENCE_ABI,
+      functionName: 'experienceCount',
+    })) as bigint;
+
+    const experiences = [];
+    for (let i = 0; i < Number(count); i++) {
+      try {
+        const experience = (await publicClient.readContract({
+          address: NOMAD_EXPERIENCE_ADDRESS,
+          abi: NOMAD_EXPERIENCE_ABI,
+          functionName: 'getExperience',
+          args: [i],
+        })) as readonly [string, string, string, string, bigint, bigint, string, bigint, bigint, boolean, bigint];
+
+        const [creator, title, description, coverImage, startTime, endTime, location, price, maxParticipants, canceled, participantCount] = experience;
+
+        if (creator.toLowerCase() === creatorAddress.toLowerCase()) {
+          experiences.push({
+            id: i,
+            creator, title, description, coverImage, startTime, endTime,
+            location, price, maxParticipants, canceled, participantCount,
+          });
+        }
+      } catch {
+        continue;
+      }
+    }
+    return experiences;
+  } catch (error) {
+    console.error(`Error fetching experiences for creator ${creatorAddress}:`, error);
+    return [];
+  }
+}
+
+/**
  * Check user status for an experience (approved, requested, or none)
  */
 export async function getUserExperienceStatusRequest(

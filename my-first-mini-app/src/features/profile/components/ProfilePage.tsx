@@ -151,9 +151,10 @@ export function ProfilePage() {
     fetchProfile();
   }, [session]);
 
-  const displayName = session?.user?.name || 'Explorer';
+  const displayName = session?.user?.username || session?.user?.name || 'Explorer';
   const firstName = displayName.split(' ')[0];
   const avatarUrl = session?.user?.profilePictureUrl;
+  const walletAddress = session?.user?.walletAddress || session?.user?.id;
 
   // Progress ring — r=40, circumference ≈ 251.3
   const r = 40;
@@ -176,7 +177,9 @@ export function ProfilePage() {
           <Image
             src={avatarUrl}
             alt={displayName}
-            className="w-9 h-9 rounded-full object-cover flex-shrink-0 border border-[#dfbfbc]"
+            width={36}
+            height={36}
+            className="w-9 h-9 rounded-full object-cover flex-shrink-0 border border-outline-variant"
           />
         ) : (
           <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 bg-[#f4dddb]">
@@ -204,7 +207,9 @@ export function ProfilePage() {
                 <Image
                   src={avatarUrl}
                   alt={displayName}
-                  className="w-24 h-24 rounded-full object-cover border-4 border-[#fff8f7]"
+                  width={96}
+                  height={96}
+                  className="w-24 h-24 rounded-full object-cover border-4 border-surface"
                 />
               ) : (
                 <div className="w-24 h-24 rounded-full flex items-center justify-center bg-[#0a1c32] border-4 border-[#fff8f7]">
@@ -230,7 +235,12 @@ export function ProfilePage() {
             </svg>
           </div>
 
-          <p className="text-[14px] text-[#fae3e1]">Digital Nomad &amp; Explorer</p>
+          {walletAddress && (
+            <p className="text-xs text-white/60 mb-1 font-mono">
+              {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+            </p>
+          )}
+          <p className="font-body-sm text-[#fae3e1]">Digital Nomad &amp; Explorer</p>
         </section>
 
         {/* ── Stats row ────────────────────────────────────────────────── */}
