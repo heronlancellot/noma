@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { MiniKit } from '@worldcoin/minikit-js';
 import { ChevronLeft, MoreVertical, MapPin, Star, ImageIcon, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { getExperiencesByCreator, getUserProfile } from '@/lib/contractUtils';
 import { formatEther } from 'viem';
 
@@ -150,22 +151,15 @@ export function HostProfilePage() {
 
       {/* ── TopAppBar ───────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-40 flex justify-between items-center w-full px-5 h-16 bg-surface shadow-sm">
-        <button
-          onClick={() => router.back()}
-          className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-low transition-colors active:scale-95"
-          aria-label="Go back"
-        >
+        <Button variant="ghost" size="icon" onClick={() => router.back()} aria-label="Go back">
           <ChevronLeft size={22} strokeWidth={2.5} className="text-primary" />
-        </button>
+        </Button>
 
         <h1 className="font-h3 text-on-surface">Host Profile</h1>
 
-        <button
-          className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-low transition-colors active:scale-95"
-          aria-label="More options"
-        >
+        <Button variant="ghost" size="icon" aria-label="More options">
           <MoreVertical size={20} className="text-on-surface" />
-        </button>
+        </Button>
       </header>
 
       <main className="pb-32">
@@ -176,37 +170,34 @@ export function HostProfilePage() {
           <div className="relative inline-block mb-4">
             <div className="p-1 rounded-full bg-gradient-to-br from-tertiary-fixed-dim to-tertiary-fixed">
               <div className="w-28 h-28 rounded-full flex items-center justify-center border-4 border-surface bg-primary">
-                <span className="font-quicksand-bold text-[36px] text-white">{initial}</span>
+                <span className="font-quicksand-bold font-h1 text-on-primary">{initial}</span>
               </div>
             </div>
             {/* Verified badge */}
-            <div className="absolute bottom-0 right-1 w-8 h-8 rounded-full flex items-center justify-center bg-white shadow-md border-2 border-surface">
+            <div className="absolute bottom-0 right-1 w-8 h-8 rounded-full flex items-center justify-center bg-surface-container-lowest shadow-md border-2 border-surface">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" fill="#3b82f6" />
-                <polyline points="8 12 11 15 16 9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="12" cy="12" r="10" fill="var(--color-primary)" />
+                <polyline points="8 12 11 15 16 9" stroke="var(--color-on-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
           </div>
 
           {/* Address */}
-          <h2 className="font-h2 text-white mb-1 break-all px-2">
+          <h2 className="font-h2 text-background mb-1 break-all px-2">
             {hostAddress
               ? hostAddress.slice(0, 6) + '...' + hostAddress.slice(-4)
               : 'Unknown'}
           </h2>
 
-          <p className="flex items-center justify-center gap-1 text-white/90 font-body-sm mb-6">
-            <MapPin size={14} strokeWidth={2} className="text-white/90" />
+          <p className="flex items-center justify-center gap-1 text-background/90 font-body-sm mb-6">
+            <MapPin size={14} strokeWidth={2} className="text-background/90" />
             World Chain
           </p>
 
           {/* Message button */}
-          <button
-            onClick={handleMessageHost}
-            className="relative z-40 rounded-lg bg-primary !px-4 !py-2 font-body-sm font-semibold !text-white shadow-sm transition-opacity hover:opacity-90"
-          >
+          <Button variant="primary" size="sm" onClick={handleMessageHost} className="relative z-40">
             Message Host
-          </button>
+          </Button>
         </section>
 
         {/* ── Stats ───────────────────────────────────────────────────────── */}

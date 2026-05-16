@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface ExperiencesErrorStateProps {
   onRetry: () => void;
@@ -27,19 +28,21 @@ export function ExperiencesErrorState({ onRetry, onGoBack }: ExperiencesErrorSta
       </div>
 
       <div className="flex flex-col gap-3 w-full">
-        <button
+        <Button
+          variant="primary"
+          size="xl"
           onClick={onRetry}
-          className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary py-4 rounded-full font-body-md font-bold active:opacity-80 transition-opacity"
         >
           <RefreshCw size={18} strokeWidth={2.5} />
           Try Again
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
+          size="xl"
           onClick={onGoBack}
-          className="w-full py-4 rounded-full font-body-md font-bold border border-outline text-on-surface active:opacity-80 transition-opacity"
         >
           Go Back
-        </button>
+        </Button>
       </div>
     </div>
   );

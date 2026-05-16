@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Calendar, MapPin } from 'lucide-react';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 import { getExperienceDetails } from '@/lib/contractUtils';
 import type { ExperienceConfirmationData } from '@/features/experience-detail/types';
 
@@ -68,8 +69,7 @@ export function ExperienceConfirmationPage() {
 
       {experience && (
         <div
-          className="w-full rounded-2xl overflow-hidden mb-6 bg-surface border border-tertiary-fixed-dim/40"
-          style={{ boxShadow: '0 2px 12px rgba(13,31,53,0.08)' }}
+          className="w-full rounded-2xl overflow-hidden mb-6 bg-surface border border-tertiary-fixed-dim/40 shadow-lg"
         >
           <div className="flex items-center gap-3 p-4">
             <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
@@ -103,19 +103,13 @@ export function ExperienceConfirmationPage() {
         </div>
       )}
 
-      <button
-        onClick={() => router.push('/')}
-        className="w-full py-4 rounded-2xl font-body-md font-bold text-white mb-4 transition-opacity active:opacity-80 bg-noma-btn"
-      >
+      <Button variant="primary" size="xl" className="mb-4" onClick={() => router.push('/')}>
         Back to Home
-      </button>
+      </Button>
 
-      <button
-        onClick={() => router.push(`/experience/${experienceId}`)}
-        className="font-body-sm font-semibold text-secondary"
-      >
+      <Button variant="secondary" size="default" onClick={() => router.push(`/experience/${experienceId}`)}>
         View Request Details
-      </button>
+      </Button>
     </div>
   );
 }

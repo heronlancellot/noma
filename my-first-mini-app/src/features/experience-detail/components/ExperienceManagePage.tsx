@@ -8,9 +8,10 @@ import { encodeFunctionData } from 'viem';
 import { MiniKit } from '@worldcoin/minikit-js';
 import { useWaitForTransactionReceipt } from '@worldcoin/minikit-react';
 import Image from 'next/image';
-import { MapPin, QrCode, Check, X } from 'lucide-react';
+import { MapPin, QrCode, Check, X, Star } from 'lucide-react';
 import { Page } from '@/components/PageLayout';
 import { ChevronLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Navigation } from '@/components/Navigation';
 import { publicClient, getJoinRequests, getParticipants } from '@/lib/contractUtils';
 import { NOMAD_EXPERIENCE_ADDRESS, NOMAD_EXPERIENCE_ABI } from '@/contracts/constants';
@@ -145,7 +146,7 @@ export function ExperienceManagePage() {
       <Page>
         <Page.Header className="p-0">
           <div className="flex items-center gap-3 px-4 py-3 bg-surface border-b border-outline-variant">
-            <button onClick={() => router.back()} className="p-1"><ChevronLeft size={22} className="text-primary" /></button>
+            <Button variant="ghost" size="icon-sm" onClick={() => router.back()} aria-label="Go back"><ChevronLeft size={22} className="text-primary" /></Button>
             <h1 className="font-h3 text-on-surface">Manage Experience</h1>
           </div>
         </Page.Header>
@@ -164,7 +165,7 @@ export function ExperienceManagePage() {
       <Page>
         <Page.Header className="p-0">
           <div className="flex items-center gap-3 px-4 py-3 bg-surface border-b border-outline-variant">
-            <button onClick={() => router.back()} className="p-1"><ChevronLeft size={22} className="text-primary" /></button>
+            <Button variant="ghost" size="icon-sm" onClick={() => router.back()} aria-label="Go back"><ChevronLeft size={22} className="text-primary" /></Button>
             <h1 className="font-h3 text-on-surface">Manage Experience</h1>
           </div>
         </Page.Header>
@@ -183,13 +184,14 @@ export function ExperienceManagePage() {
       <Page.Header className="p-0">
         <div className="flex items-center justify-between px-4 py-3 bg-surface border-b border-outline-variant">
           <h1 className="font-h3 text-on-surface">Schedule</h1>
-          <button
+          <Button
+            variant="ghost"
+            size="icon-sm"
             onClick={() => router.push(`/experience/${experienceId}`)}
-            className="p-2 hover:bg-surface-container rounded-lg transition-colors"
             aria-label="View QR Code"
           >
             <QrCode size={24} className="text-on-surface" strokeWidth={2} />
-          </button>
+          </Button>
         </div>
       </Page.Header>
 
@@ -209,8 +211,8 @@ export function ExperienceManagePage() {
                   <div className="relative w-full h-48">
                     <Image src={experience.images[0]} alt={experience.title} fill className="object-cover" />
                     <div className="absolute top-3 right-3 bg-surface/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1">
-                      <span className="text-tertiary-fixed-dim text-sm">★</span>
-                      <span className="text-on-surface text-sm font-semibold">{experience.rating}</span>
+                      <Star size={14} fill="currentColor" stroke="currentColor" className="text-tertiary-fixed-dim" strokeWidth={1} />
+                      <span className="font-body-sm font-semibold text-on-surface">{experience.rating}</span>
                     </div>
                   </div>
                   <div className="p-4">
@@ -227,10 +229,12 @@ export function ExperienceManagePage() {
                       <span className="font-body-sm text-on-surface">{experience.location}</span>
                     </div>
                     <div className="flex gap-2">
-                      <button
+                      <Button
+                        variant="primary"
+                        size="sm"
                         onClick={() => handleApprove(request.address)}
                         disabled={processingAddress === request.address}
-                        className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:bg-outline disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg font-body-sm font-semibold transition-colors"
+                        className="flex-1 bg-primary hover:bg-primary/90"
                       >
                         {processingAddress === request.address ? (
                           <span>Processing...</span>
@@ -240,11 +244,13 @@ export function ExperienceManagePage() {
                             <span>Approve</span>
                           </>
                         )}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
                         onClick={() => handleReject(request.address)}
                         disabled={processingAddress === request.address}
-                        className="flex-1 flex items-center justify-center gap-2 bg-error hover:bg-error/90 active:bg-error/80 disabled:bg-outline disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg font-body-sm font-semibold transition-colors"
+                        className="flex-1 bg-error text-on-primary hover:bg-error/90"
                       >
                         {processingAddress === request.address ? (
                           <span>Processing...</span>
@@ -254,7 +260,7 @@ export function ExperienceManagePage() {
                             <span>Reject</span>
                           </>
                         )}
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -272,8 +278,8 @@ export function ExperienceManagePage() {
                   <div className="relative w-full h-48">
                     <Image src={experience.images[0]} alt={experience.title} fill className="object-cover" />
                     <div className="absolute top-3 right-3 bg-surface/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1">
-                      <span className="text-tertiary-fixed-dim text-sm">★</span>
-                      <span className="text-on-surface text-sm font-semibold">{experience.rating}</span>
+                      <Star size={14} fill="currentColor" stroke="currentColor" className="text-tertiary-fixed-dim" strokeWidth={1} />
+                      <span className="font-body-sm font-semibold text-on-surface">{experience.rating}</span>
                     </div>
                   </div>
                   <div className="p-4">
@@ -289,12 +295,14 @@ export function ExperienceManagePage() {
                       <MapPin size={16} className="text-on-surface" strokeWidth={2} />
                       <span className="font-body-sm text-on-surface">{experience.location}</span>
                     </div>
-                    <button
+                    <Button
+                      variant="outline"
+                      size="sm"
                       disabled
-                      className="w-full bg-secondary text-on-secondary px-4 py-2.5 rounded-lg font-body-sm font-semibold cursor-not-allowed"
+                      className="w-full"
                     >
                       Approved
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}

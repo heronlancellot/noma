@@ -35,16 +35,16 @@ export function ContractDebugger() {
   };
 
   return (
-    <div className="p-4 bg-gray-100 rounded-lg">
-      <h2 className="text-lg font-bold mb-4">Contract Debugger</h2>
+    <div className="p-4 bg-surface-container rounded-lg">
+      <h2 className="font-h3 text-on-surface mb-4">Contract Debugger</h2>
       <button
         onClick={testContract}
         disabled={loading}
-        className="px-4 py-2 bg-blue-500 text-white rounded mb-4 disabled:bg-gray-400"
+        className="px-4 py-2 bg-primary text-on-primary rounded mb-4 disabled:opacity-50"
       >
         {loading ? 'Testing...' : 'Test Contract'}
       </button>
-      <pre className="bg-white p-4 rounded text-xs overflow-auto max-h-96 border border-gray-300">
+      <pre className="bg-surface-container-lowest p-4 rounded text-xs overflow-auto max-h-96 border border-outline-variant">
         {debugInfo || 'Click "Test Contract" to start debugging...'}
       </pre>
     </div>

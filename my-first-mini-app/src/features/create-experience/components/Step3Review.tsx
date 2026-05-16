@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { Control, FieldErrors, Controller, useWatch } from 'react-hook-form';
 import { CreateFormData, ButtonState } from '@/features/create-experience/types';
+import Image from 'next/image';
 import { ImageIcon, MapPin, Clock, X } from 'lucide-react';
 import { CreateExperienceHeader } from '@/features/create-experience/components/Header';
 import { CreateExperienceFooter } from '@/features/create-experience/components/Footer';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import NomajinFace from '@/features/create-experience/components/NomajinFace';
@@ -32,6 +34,9 @@ export default function Step3Review({ formData, control, errors, onPublish, onBa
       {showTerms && (
         <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/40" onClick={() => setShowTerms(false)}>
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Terms and Conditions"
             className="bg-surface w-full max-w-[390px] rounded-t-3xl max-h-[85vh] flex flex-col animate-in slide-in-from-bottom duration-300"
             onClick={e => e.stopPropagation()}
           >
@@ -43,12 +48,9 @@ export default function Step3Review({ formData, control, errors, onPublish, onBa
             {/* Header */}
             <div className="flex items-center justify-between px-5 pb-4 pt-2">
               <h2 className="font-h2 text-on-surface">Terms &amp; Conditions</h2>
-              <button
-                onClick={() => setShowTerms(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-low"
-              >
+              <Button variant="ghost" size="icon-sm" onClick={() => setShowTerms(false)}>
                 <X size={20} className="text-on-surface-variant" />
-              </button>
+              </Button>
             </div>
 
             {/* Content */}
@@ -108,12 +110,9 @@ export default function Step3Review({ formData, control, errors, onPublish, onBa
 
             {/* Close button */}
             <div className="px-5 pb-6 pt-3 border-t border-outline-variant/20">
-              <button
-                onClick={() => setShowTerms(false)}
-                className="w-full py-3.5 rounded-2xl font-body-md font-bold text-white bg-noma-btn active:opacity-80 transition-opacity"
-              >
+              <Button variant="primary" size="xl" onClick={() => setShowTerms(false)}>
                 I Understand
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -126,11 +125,11 @@ export default function Step3Review({ formData, control, errors, onPublish, onBa
           <h3 className="font-h3 text-on-surface mb-3">Experience Preview</h3>
           <div className="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-card">
             <div className="relative w-full h-44">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={formData.coverImage || '/image-default.png'}
                 alt="Cover"
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
               {formData.category && (
@@ -153,14 +152,14 @@ export default function Step3Review({ formData, control, errors, onPublish, onBa
               {formData.location && (
                 <div className="flex items-center gap-1.5 text-on-surface-variant">
                   <MapPin size={14} />
-                  <span className="text-sm">{formData.location}</span>
+                  <span className="font-body-sm">{formData.location}</span>
                 </div>
               )}
 
               {(formData.duration || formData.maxGuests) && (
                 <div className="flex items-center gap-1.5 text-on-surface-variant">
                   <Clock size={14} />
-                  <span className="text-sm">
+                  <span className="font-body-sm">
                     {[formData.duration, formData.maxGuests && `Up to ${formData.maxGuests} people`]
                       .filter(Boolean).join(' • ')}
                   </span>
@@ -190,7 +189,7 @@ export default function Step3Review({ formData, control, errors, onPublish, onBa
             <p className="font-body-md font-semibold text-on-surface mb-1">
               {formData.coverImage ? 'Tap to change cover photo' : 'Tap to add cover photo'}
             </p>
-            <p className="text-sm text-on-surface-variant">JPEG or PNG, max 5MB</p>
+            <p className="font-body-sm text-on-surface-variant">JPEG or PNG, max 5MB</p>
           </label>
           {errors.coverImage && (
             <p className="text-xs text-error font-semibold mt-1 px-1">{errors.coverImage.message}</p>
@@ -221,15 +220,11 @@ export default function Step3Review({ formData, control, errors, onPublish, onBa
                   onCheckedChange={onChange}
                   className="mt-0.5 shrink-0"
                 />
-                <label htmlFor="terms" className="text-sm text-on-surface-variant leading-relaxed cursor-pointer">
+                <label htmlFor="terms" className="font-body-sm text-on-surface-variant leading-relaxed cursor-pointer">
                   I agree to the{' '}
-                  <button
-                    type="button"
-                    onClick={() => setShowTerms(true)}
-                    className="text-primary font-semibold underline decoration-primary/30 inline"
-                  >
+                  <Button variant="link" size="sm" className="inline p-0 h-auto text-sm" onClick={() => setShowTerms(true)}>
                     Terms &amp; Conditions
-                  </button>{' '}
+                  </Button>{' '}
                   and confirm that this experience complies with community guidelines.
                 </label>
               </div>

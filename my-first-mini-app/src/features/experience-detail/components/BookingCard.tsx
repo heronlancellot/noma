@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface BookingCardProps {
   price: string;
@@ -20,13 +21,10 @@ export function BookingCard({
   const isProcessing = joinLoading || isConfirming;
 
   return (
-    <div
-      className="bg-surface-container-lowest p-6 rounded-3xl flex flex-col gap-5"
-      style={{ boxShadow: '0 4px 24px rgba(37,25,24,0.10)' }}
-    >
+    <div className="bg-surface-container-lowest p-6 rounded-3xl flex flex-col gap-5 shadow-lg">
       {/* Price */}
       <div className="flex gap-0.5 items-center">
-        <span className="text-xl text-secondary font-bold leading-tight tracking-tight">{price}</span>
+        <span className="font-h3 text-secondary">{price}</span>
         <span className="font-body-md text-secondary font-medium">{" "} /person</span>
       </div>
 
@@ -61,23 +59,19 @@ export function BookingCard({
 
       {/* CTA button */}
       {isCreator ? (
-        <button
-          onClick={onManage}
-          className="w-full bg-secondary text-on-secondary py-4 rounded-full text-lg font-bold shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
-        >
+        <Button variant="outline" size="xl" onClick={onManage}>
           Manage Experience
-        </button>
+        </Button>
       ) : (
-        <button
+        <Button
+          variant="primary"
+          size="xl"
           onClick={onJoin}
           disabled={isProcessing}
-          className={`w-full !py-4 rounded-full text-lg font-bold !text-white shadow-md transition-all active:scale-[0.98] ${
-            isProcessing ? 'bg-outline cursor-not-allowed' : 'bg-noma-btn'
-          }`}
-          style={!isProcessing ? { boxShadow: '0 4px 16px rgba(167,50,47,0.35)' } : undefined}
+          className={isProcessing ? 'bg-outline cursor-not-allowed' : ''}
         >
           {isProcessing ? 'Processing...' : 'Join Experience'}
-        </button>
+        </Button>
       )}
 
       <p className="text-center font-body-sm text-secondary/70">

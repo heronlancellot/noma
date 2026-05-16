@@ -1,6 +1,7 @@
 'use client';
 
 import { Navigation } from '@/components/Navigation';
+import { Button } from '@/components/ui/button';
 import { User, Search, Check, Hourglass, Plus, Calendar } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
@@ -128,19 +129,19 @@ export function NotificationsPage() {
           <div className="w-9 h-9 rounded-full overflow-hidden bg-surface-container flex items-center justify-center hover:bg-surface-container-low cursor-pointer transition-colors">
             <User size={18} strokeWidth={2} className="text-on-surface-variant" />
           </div>
-          <h1 className="font-h2 text-on-surface">NOMA</h1>
-          <button className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-primary">
+          <span className="font-h2 text-on-surface">NOMA</span>
+          <Button variant="ghost" size="icon-sm" aria-label="Search">
             <Search size={18} strokeWidth={2} className="text-primary" />
-          </button>
+          </Button>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-screen-md mx-auto px-5 py-6 flex flex-col gap-4">
-        <header className="mb-1">
-          <h2 className="font-h1 text-on-background">Activity</h2>
+        <div className="mb-1">
+          <h1 className="font-h1 text-on-surface">Activity</h1>
           <p className="font-body-sm text-secondary mt-1">Stay updated on your recent interactions.</p>
-        </header>
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-10">
@@ -157,7 +158,7 @@ export function NotificationsPage() {
             {created.map(n => (
               <div
                 key={n.id}
-                onClick={() => router.push(`/experience/${n.experienceId}`)}
+                role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/experience/${n.experienceId}`); }} onClick={() => router.push(`/experience/${n.experienceId}`)}
                 className="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-surface-variant flex items-start gap-4 relative overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
               >
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-container rounded-l-2xl" />
@@ -170,7 +171,7 @@ export function NotificationsPage() {
                   <div className="flex justify-between items-baseline mb-1">
                     <span className="font-label-caps text-tertiary-container">{n.title}</span>
                     {n.timeLabel && (
-                      <span className="font-body-sm text-secondary text-xs whitespace-nowrap ml-2">{n.timeLabel}</span>
+                      <span className="text-xs text-secondary whitespace-nowrap ml-2">{n.timeLabel}</span>
                     )}
                   </div>
                   <p className="font-body-sm text-on-background leading-snug">
@@ -189,7 +190,7 @@ export function NotificationsPage() {
             {approved.map(n => (
               <div
                 key={n.id}
-                onClick={() => router.push(`/experience/${n.experienceId}`)}
+                role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/experience/${n.experienceId}`); }} onClick={() => router.push(`/experience/${n.experienceId}`)}
                 className="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-surface-variant flex items-start gap-4 relative overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
               >
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-2xl" />
@@ -205,7 +206,7 @@ export function NotificationsPage() {
                   <div className="flex justify-between items-baseline mb-1">
                     <span className="font-label-caps text-primary">{n.title}</span>
                     {n.timeLabel && (
-                      <span className="font-body-sm text-secondary text-xs whitespace-nowrap ml-2">{n.timeLabel}</span>
+                      <span className="text-xs text-secondary whitespace-nowrap ml-2">{n.timeLabel}</span>
                     )}
                   </div>
                   <p className="font-body-sm text-on-background leading-snug">
@@ -225,7 +226,7 @@ export function NotificationsPage() {
             {pending.map(n => (
               <div
                 key={n.id}
-                onClick={() => router.push(`/experience/${n.experienceId}`)}
+                role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/experience/${n.experienceId}`); }} onClick={() => router.push(`/experience/${n.experienceId}`)}
                 className="bg-surface-container-low rounded-2xl p-4 flex items-start gap-4 border border-transparent hover:border-outline-variant/50 transition-colors cursor-pointer"
               >
                 <div className="relative shrink-0 opacity-80">
@@ -240,7 +241,7 @@ export function NotificationsPage() {
                   <div className="flex justify-between items-baseline mb-1">
                     <span className="font-label-caps text-tertiary-container">{n.title}</span>
                     {n.timeLabel && (
-                      <span className="font-body-sm text-secondary text-xs whitespace-nowrap ml-2">{n.timeLabel}</span>
+                      <span className="text-xs text-secondary whitespace-nowrap ml-2">{n.timeLabel}</span>
                     )}
                   </div>
                   <p className="font-body-sm text-secondary leading-snug">

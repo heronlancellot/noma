@@ -1,21 +1,27 @@
 'use client';
 
+import { twMerge } from 'tailwind-merge';
+
 interface TagChipProps {
   label: string;
   variant?: 'gold' | 'pink' | 'default';
+  className?: string;
 }
 
-export const TagChip = ({ label, variant = 'default' }: TagChipProps) => {
-  const styles = {
-    gold: { backgroundColor: '#fcedd2', color: '#b88c3a' },
-    pink: { backgroundColor: '#fcebe8', color: '#5a5a6e' },
-    default: { backgroundColor: '#fff', color: '#5a5a6e', border: '1px solid #e5e7eb' },
-  };
+const variantClasses: Record<string, string> = {
+  gold: 'bg-tertiary-fixed text-tertiary-container',
+  pink: 'bg-surface-container text-secondary',
+  default: 'bg-surface-container-lowest text-secondary border border-outline-variant',
+};
 
+export const TagChip = ({ label, variant = 'default', className }: TagChipProps) => {
   return (
     <span
-      className="inline-flex items-center px-4 py-1.5 rounded-full text-[12px] font-semibold uppercase tracking-wide"
-      style={styles[variant]}
+      className={twMerge(
+        'inline-flex items-center px-4 py-1.5 rounded-full font-label-caps',
+        variantClasses[variant],
+        className,
+      )}
     >
       {label}
     </span>

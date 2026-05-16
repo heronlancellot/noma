@@ -1,6 +1,7 @@
 'use client';
 
 import { AuthButton } from '@/features/auth/components/AuthButton';
+import { Button } from '@/components/ui/button';
 import { Settings } from 'lucide-react';
 
 export const LoginPage = () => {
@@ -8,13 +9,9 @@ export const LoginPage = () => {
     <div className="min-h-screen noma-splash-gradient flex flex-col relative overflow-hidden">
       {/* Header */}
       <header className="w-full flex justify-end p-6">
-        <button
-          type="button"
-          aria-label="Settings"
-          className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center text-white/90 hover:bg-black/30 transition-colors"
-        >
+        <Button variant="ghost" size="icon" aria-label="Settings" className="bg-black/20 backdrop-blur-sm text-white/90 hover:bg-black/30">
           <Settings size={20} />
-        </button>
+        </Button>
       </header>
 
       {/* Main content */}
@@ -46,7 +43,7 @@ export const LoginPage = () => {
             >
               <path
                 d="M2 8C50 2 150 2 198 8"
-                stroke="white"
+                stroke="currentColor"
                 strokeLinecap="round"
                 strokeWidth="3"
               />
@@ -68,7 +65,7 @@ export const LoginPage = () => {
       {/* NOMA badge */}
       <div className="absolute bottom-6 left-6 w-10 h-10 rounded-full bg-noma-btn flex items-center justify-center border-2 border-foreground shadow-md">
         <span className="font-h3 text-white font-bold leading-none">N</span>
-        <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full border border-foreground" />
+        <div className="absolute -top-1 -right-1 w-3 h-3 bg-surface-container-lowest rounded-full border border-foreground" />
       </div>
     </div>
   );

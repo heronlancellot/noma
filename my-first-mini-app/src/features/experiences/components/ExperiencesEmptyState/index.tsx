@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 
 interface ExperiencesEmptyStateProps {
   hasActiveFilters: boolean;
@@ -24,12 +25,13 @@ export function ExperiencesEmptyState({ hasActiveFilters, onClearFilters }: Expe
       </div>
 
       {hasActiveFilters && (
-        <button
+        <Button
+          variant="primary"
+          size="lg"
           onClick={onClearFilters}
-          className="px-10 py-4 rounded-full font-body-md font-bold bg-noma-btn text-on-primary active:opacity-80 transition-opacity"
         >
           Clear Filters
-        </button>
+        </Button>
       )}
     </div>
   );

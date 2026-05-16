@@ -20,7 +20,7 @@ export const UserInfo = () => {
         />
       ) : (
         <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center">
-          <span className="font-quicksand-bold text-xl text-white">
+          <span className="font-quicksand-bold text-xl text-on-primary">
             {(username || 'U').charAt(0).toUpperCase()}
           </span>
         </div>
@@ -30,8 +30,8 @@ export const UserInfo = () => {
           {username}
         </span>
         {avatarUrl && (
-          <div className="ml-1.5 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-            <CheckCircle2 size={14} className="text-white" />
+          <div className="ml-1.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+            <CheckCircle2 size={14} className="text-on-primary" />
           </div>
         )}
       </div>

@@ -79,7 +79,7 @@ export function ExperienceDetailPage() {
       <div className="min-h-screen flex items-center justify-center px-8 bg-surface">
         <div className="text-center">
           <p className="font-semibold text-on-surface mb-2">Experience not found</p>
-          <p className="text-sm text-on-surface-variant">{error || 'Data unavailable'}</p>
+          <p className="font-body-sm text-on-surface-variant">{error || 'Data unavailable'}</p>
         </div>
       </div>
     );

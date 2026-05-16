@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useMemo } from 'react';
 import { formatUnits } from 'viem';
 import { ChevronLeft, Search, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Navigation } from '@/components/Navigation';
 import { useExperiences } from '@/features/experiences/hooks/useExperiences';
 import { guessCategory } from '@/features/experiences/utils';
@@ -44,26 +45,40 @@ export function ExperiencesPage() {
   }, [experiences, search, activeCategory]);
 
   return (
-    <div className="min-h-screen flex flex-col pb-28" style={{ backgroundColor: '#fff8f7', fontFamily: 'Poppins, sans-serif' }}>
-      <header className="sticky top-0 z-40 px-5 pt-10 pb-4 flex flex-col gap-4" style={{ backgroundColor: '#fff8f7' }}>
+    <div className="min-h-screen flex flex-col pb-28 bg-surface font-sans">
+      <header className="sticky top-0 z-40 px-5 pt-10 pb-4 flex flex-col gap-4 bg-surface">
         <div className="flex items-center gap-3">
-          <button onClick={() => router.back()} className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#ffe9e7' }}>
+          <Button variant="ghost" size="icon" onClick={() => router.back()} className="bg-surface-container">
             <ChevronLeft size={20} strokeWidth={2.5} className="text-on-surface" />
-          </button>
-          <h1 style={{ fontFamily: 'Quicksand, sans-serif', fontSize: 28, fontWeight: 700, color: '#251918', letterSpacing: '-0.02em' }}>All Experiences</h1>
+          </Button>
+          <h1 className="font-h1 text-on-surface tracking-tight">All Experiences</h1>
         </div>
-        <div className="flex items-center gap-3" style={{ backgroundColor: '#ffffff', border: '1px solid #dfbfbc', borderRadius: 12, padding: '0 16px', boxShadow: '0px 2px 4px rgba(13,31,53,0.06)' }}>
+        <div className="flex items-center gap-3 bg-surface-container-lowest border border-outline-variant rounded-xl px-4 shadow-sm">
           <Search size={18} className="text-on-surface-variant" strokeWidth={2} />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search experiences..." className="flex-1 bg-transparent focus:outline-none" style={{ padding: '14px 0', fontSize: 14, color: '#251918' }} />
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search experiences..."
+            className="flex-1 bg-transparent focus:outline-none py-3.5 font-body-sm text-on-surface placeholder:text-outline"
+          />
           {search && (
-            <button onClick={() => setSearch('')}>
+            <Button variant="ghost" size="icon-sm" onClick={() => setSearch('')} className="p-0">
               <X size={16} strokeWidth={2} className="text-outline" />
-            </button>
+            </Button>
           )}
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
           {CATEGORIES.map(cat => (
-            <button key={cat} onClick={() => setActiveCategory(cat)} className="flex-shrink-0" style={{ padding: '8px 18px', borderRadius: 9999, fontSize: 12, fontWeight: 600, letterSpacing: '0.05em', backgroundColor: activeCategory === cat ? '#a7322f' : '#ffe9e7', color: activeCategory === cat ? '#fff' : '#58413f' }}>
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`flex-shrink-0 px-5 py-2 rounded-full font-label-caps transition-colors ${
+                activeCategory === cat
+                  ? 'bg-primary text-on-primary'
+                  : 'bg-surface-container text-on-surface-variant'
+              }`}
+            >
               {cat}
             </button>
           ))}
@@ -81,21 +96,21 @@ export function ExperiencesPage() {
           </div>
         )}
         {error && (
-          <div className="rounded-xl p-4 mt-4" style={{ backgroundColor: '#ffdad6', border: '1px solid #ffb3ad' }}>
-            <p style={{ fontWeight: 600, fontSize: 14, color: '#410003' }}>Failed to load</p>
-            <p style={{ fontSize: 13, color: '#93000a', marginTop: 4 }}>{error}</p>
+          <div className="rounded-xl p-4 mt-4 bg-error/10 border border-error/20">
+            <p className="font-body-sm font-semibold text-on-error-container">Failed to load</p>
+            <p className="font-body-sm text-error mt-1">{error}</p>
           </div>
         )}
         {!loading && !error && events.length === 0 && (
           <div className="flex flex-col items-center py-20 gap-3">
-            <span style={{ fontSize: 48 }}>🌤️</span>
-            <p style={{ fontSize: 15, fontWeight: 500, color: '#58413f' }}>No experiences found</p>
-            <p style={{ fontSize: 13, color: '#8b716e' }}>Try a different search or category</p>
+            <span className="text-5xl">🌤️</span>
+            <p className="font-body-md font-medium text-on-surface-variant">No experiences found</p>
+            <p className="font-body-sm text-outline">Try a different search or category</p>
           </div>
         )}
         {!loading && !error && events.length > 0 && (
           <>
-            <p style={{ fontSize: 13, color: '#8b716e', marginBottom: 16, marginTop: 4 }}>{events.length} experience{events.length !== 1 ? 's' : ''}</p>
+            <p className="font-body-sm text-outline mb-4 mt-1">{events.length} experience{events.length !== 1 ? 's' : ''}</p>
             <div className="grid grid-cols-2 gap-3">
               {events.map(event => <CompactCard key={event.id} {...event} />)}
             </div>

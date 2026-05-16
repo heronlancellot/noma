@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { getExperienceDetails, getUserApprovedExperiences, getUserRequestedExperiences } from '@/lib/contractUtils';
 import { formatUnits } from 'viem';
 import { useSession } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
 import { User, Search, MapPin, Check } from 'lucide-react';
 
 interface ExperienceItem {
@@ -20,20 +21,15 @@ interface ExperienceItem {
   category?: string;
 }
 
-const CATEGORY_BADGE: Record<string, { bg: string; color: string }> = {
-  Wellness:   { bg: 'rgba(244,191,0,0.15)',  color: '#d3a500' },
-  Networking: { bg: 'rgba(212,227,255,0.50)', color: '#4f5f78' },
-  Hiking:     { bg: 'rgba(244,191,0,0.15)',  color: '#d3a500' },
-  Surf:       { bg: 'rgba(212,227,255,0.50)', color: '#4f5f78' },
-  Yoga:       { bg: 'rgba(244,191,0,0.15)',  color: '#d3a500' },
-  Social:     { bg: 'rgba(252,231,240,0.60)', color: '#9d174d' },
-  default:    { bg: 'rgba(244,221,219,0.50)', color: '#58413f' },
+const CATEGORY_BADGE: Record<string, { bg: string; text: string }> = {
+  Wellness:   { bg: 'bg-tertiary-fixed-dim/15', text: 'text-tertiary-container' },
+  Networking: { bg: 'bg-secondary/10', text: 'text-secondary' },
+  Hiking:     { bg: 'bg-tertiary-fixed-dim/15', text: 'text-tertiary-container' },
+  Surf:       { bg: 'bg-secondary/10', text: 'text-secondary' },
+  Yoga:       { bg: 'bg-tertiary-fixed-dim/15', text: 'text-tertiary-container' },
+  Social:     { bg: 'bg-surface-container/60', text: 'text-secondary' },
+  default:    { bg: 'bg-surface-container-highest/50', text: 'text-on-surface-variant' },
 };
-
-const NODE_COLORS = [
-  { border: '#f4bf00', dot: '#f4bf00', card: '#f4bf00' },  // first — gold
-  { border: '#f4dddb', dot: '#b6c7e4', card: '#b6c7e4' },  // second — blue
-];
 
 const HISTORY_ICONS: Record<string, string> = {
   Yoga: '🧘', Hiking: '🥾', Surf: '🏄', Social: '🎉', Wellness: '🌿',
@@ -96,9 +92,9 @@ export function CalendarPage() {
 
   if (loading) {
     return (
-      <div style={{ backgroundColor: '#fff8f7', minHeight: '100vh' }}>
+      <div className="bg-surface min-h-screen">
         <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: '#a7322f' }} />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
         <Navigation />
       </div>
@@ -106,161 +102,108 @@ export function CalendarPage() {
   }
 
   return (
-    <div style={{ backgroundColor: '#fff8f7', minHeight: '100vh' }}>
+    <div className="bg-surface min-h-screen">
       {/* Header */}
-      <header
-        className="flex items-center justify-between px-5 sticky top-0 z-40"
-        style={{ backgroundColor: '#fff8f7', height: 64 }}
-      >
+      <header className="flex items-center justify-between px-container-padding sticky top-0 z-40 bg-surface h-16">
         {/* Avatar */}
-        <div
-          className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ backgroundColor: '#f4dddb' }}
-        >
+        <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 bg-surface-container-highest">
           <User size={18} strokeWidth={2} className="text-primary" />
         </div>
 
         {/* NOMA wordmark */}
-        <h2
-          className="font-bold tracking-wide"
-          style={{ fontFamily: 'Quicksand, sans-serif', fontSize: 20, color: '#251918', letterSpacing: '0.08em' }}
-        >
-          NOMA
-        </h2>
+        <h2 className="font-h3 tracking-widest">NOMA</h2>
 
         {/* Search icon */}
-        <button
-          className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ backgroundColor: 'transparent' }}
-          aria-label="Search"
-        >
+        <Button variant="ghost" size="icon-sm" aria-label="Search">
           <Search size={20} strokeWidth={2} className="text-primary" />
-        </button>
+        </Button>
       </header>
 
-      <main className="px-5 pt-6 pb-32">
+      <main className="px-container-padding pt-6 pb-32">
         {/* Coming Up */}
-        <section className="mb-8">
-          <h2
-            className="font-bold mb-5"
-            style={{ fontFamily: 'Quicksand, sans-serif', fontSize: 22, color: '#251918' }}
-          >
-            Coming Up
-          </h2>
+        <section className="mb-8" aria-label="Upcoming">
+          <h2 className="font-h2 text-on-surface mb-5">Coming Up</h2>
 
           {nextExperiences.length === 0 ? (
             <div className="flex flex-col items-center py-10 gap-3">
-              <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl"
-                style={{ backgroundColor: '#f4dddb' }}
-              >
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl bg-surface-container-highest">
                 📅
               </div>
-              <p className="text-sm font-medium" style={{ color: '#58413f' }}>No upcoming experiences</p>
+              <p className="font-body-sm font-medium text-on-surface-variant">No upcoming experiences</p>
             </div>
           ) : (
             <div className="relative">
               {/* Vertical timeline line */}
-              <div
-                className="absolute top-4 bottom-4"
-                style={{ left: 15, width: 2, backgroundColor: '#f4dddb', zIndex: 0 }}
-              />
+              <div className="absolute top-4 bottom-4 left-[15px] w-0.5 bg-surface-container-highest z-0" />
 
               <div className="flex flex-col gap-5">
                 {nextExperiences.map((exp, idx) => {
                   const { date, time } = formatStartTime(exp.startTime);
-                  const nodeColor = NODE_COLORS[idx] ?? NODE_COLORS[1];
+                  const isFirst = idx === 0;
                   const badge = exp.category
                     ? (CATEGORY_BADGE[exp.category] ?? CATEGORY_BADGE.default)
                     : null;
 
                   return (
-                    <div
+                    <button
                       key={exp.id}
-                      className="flex gap-4 cursor-pointer"
+                      type="button"
+                      className="flex gap-4 text-left w-full"
                       onClick={() => router.push(`/experience/${exp.id}`)}
                     >
                       {/* Timeline node */}
                       <div className="flex-shrink-0 z-10 mt-3">
                         <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center"
-                          style={{
-                            backgroundColor: '#fff8f7',
-                            border: `2px solid ${nodeColor.border}`,
-                          }}
+                          className={`w-8 h-8 rounded-full flex items-center justify-center bg-surface border-2 ${
+                            isFirst ? 'border-tertiary-fixed-dim' : 'border-surface-container-highest'
+                          }`}
                         >
                           <div
-                            className="rounded-full"
-                            style={{
-                              width: idx === 0 ? 12 : 8,
-                              height: idx === 0 ? 12 : 8,
-                              backgroundColor: nodeColor.dot,
-                            }}
+                            className={`rounded-full ${
+                              isFirst
+                                ? 'w-3 h-3 bg-tertiary-fixed-dim'
+                                : 'w-2 h-2 bg-secondary/40'
+                            }`}
                           />
                         </div>
                       </div>
 
                       {/* Card */}
                       <div
-                        className="flex-1 rounded-2xl p-4 active:scale-[0.99] transition-transform"
-                        style={{
-                          backgroundColor: '#ffffff',
-                          boxShadow: '0px 2px 8px rgba(13,31,53,0.06)',
-                          borderLeft: `4px solid ${nodeColor.card}`,
-                        }}
+                        className={`flex-1 rounded-2xl p-4 active:scale-[0.99] transition-transform bg-surface-container-lowest shadow-sm border-l-4 ${
+                          isFirst ? 'border-l-tertiary-fixed-dim' : 'border-l-secondary/40'
+                        }`}
                       >
                         {/* Date + badge row */}
                         <div className="flex items-center justify-between gap-2 mb-2">
-                          <span
-                            className="font-semibold uppercase tracking-wide"
-                            style={{ fontSize: 11, color: '#58413f' }}
-                          >
+                          <span className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
                             {date}{time ? ` • ${time}` : ''}
                           </span>
                           {badge && exp.category ? (
                             <span
-                              className="font-semibold rounded-full flex-shrink-0"
-                              style={{
-                                fontSize: 11,
-                                padding: '3px 10px',
-                                backgroundColor: badge.bg,
-                                color: badge.color,
-                              }}
+                              className={`text-xs font-semibold rounded-full flex-shrink-0 px-2.5 py-0.5 ${badge.bg} ${badge.text}`}
                             >
                               {exp.category}
                             </span>
                           ) : exp.status === 'pending' ? (
-                            <span
-                              className="font-semibold rounded-full flex-shrink-0"
-                              style={{
-                                fontSize: 11,
-                                padding: '3px 10px',
-                                backgroundColor: 'rgba(244,191,0,0.15)',
-                                color: '#d3a500',
-                              }}
-                            >
+                            <span className="text-xs font-semibold rounded-full flex-shrink-0 px-2.5 py-0.5 bg-tertiary-fixed-dim/15 text-tertiary-container">
                               Pending
                             </span>
                           ) : null}
                         </div>
 
                         {/* Title */}
-                        <h3
-                          className="font-bold mb-1.5"
-                          style={{ fontFamily: 'Quicksand, sans-serif', fontSize: 17, color: '#251918' }}
-                        >
-                          {exp.title}
-                        </h3>
+                        <h3 className="font-h3 text-on-surface mb-1.5">{exp.title}</h3>
 
                         {/* Location */}
                         {exp.location && (
                           <div className="flex items-center gap-1.5">
                             <MapPin size={13} strokeWidth={2} className="text-on-surface-variant" />
-                            <span style={{ fontSize: 13, color: '#58413f' }}>{exp.location}</span>
+                            <span className="font-body-sm text-on-surface-variant">{exp.location}</span>
                           </div>
                         )}
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -270,13 +213,8 @@ export function CalendarPage() {
 
         {/* History */}
         {historyExperiences.length > 0 && (
-          <section>
-            <h2
-              className="font-bold mb-4"
-              style={{ fontFamily: 'Quicksand, sans-serif', fontSize: 22, color: '#58413f' }}
-            >
-              History
-            </h2>
+          <section aria-label="History">
+            <h2 className="font-h2 text-on-surface-variant mb-4">History</h2>
             <div className="flex flex-col gap-3">
               {historyExperiences.map(exp => {
                 const emoji = exp.category
@@ -284,52 +222,33 @@ export function CalendarPage() {
                   : HISTORY_ICONS.default;
                 const { date } = formatStartTime(exp.startTime);
                 return (
-                  <div
+                  <button
                     key={exp.id}
-                    className="flex items-center gap-4 p-4 rounded-2xl cursor-pointer active:scale-[0.99] transition-transform"
-                    style={{
-                      backgroundColor: '#fff0ef',
-                      border: '1px solid rgba(223,191,188,0.30)',
-                      opacity: 0.85,
-                    }}
+                    type="button"
+                    className="flex items-center gap-4 p-4 rounded-2xl active:scale-[0.99] transition-transform bg-surface-container-low border border-outline-variant/30 opacity-85 text-left w-full"
                     onClick={() => router.push(`/experience/${exp.id}`)}
                   >
                     {/* Icon box */}
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
-                      style={{ backgroundColor: '#f4dddb' }}
-                    >
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xl bg-surface-container-highest">
                       {emoji}
                     </div>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <h3
-                        className="font-bold truncate"
-                        style={{ fontFamily: 'Quicksand, sans-serif', fontSize: 15, color: '#251918' }}
-                      >
-                        {exp.title}
-                      </h3>
+                      <h3 className="font-body-md font-semibold text-on-surface truncate">{exp.title}</h3>
                       {exp.location && (
-                        <p className="mt-0.5 truncate" style={{ fontSize: 13, color: '#58413f' }}>
-                          {exp.location}
-                        </p>
+                        <p className="mt-0.5 font-body-sm text-on-surface-variant truncate">{exp.location}</p>
                       )}
                       {date !== 'TBD' && (
-                        <p className="mt-0.5" style={{ fontSize: 11, color: '#8b716e' }}>
-                          {date}
-                        </p>
+                        <p className="mt-0.5 text-xs text-outline">{date}</p>
                       )}
                     </div>
 
                     {/* Checkmark */}
-                    <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: '#f4dddb' }}
-                    >
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 bg-surface-container-highest">
                       <Check size={14} strokeWidth={2.5} className="text-primary" />
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>

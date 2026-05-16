@@ -12,11 +12,11 @@ export function MapPlaceholder({ location }: MapPlaceholderProps) {
         className="absolute inset-0 opacity-[0.07]"
         style={{
           backgroundImage:
-            'repeating-linear-gradient(0deg, #251918 0px, #251918 1px, transparent 1px, transparent 40px), repeating-linear-gradient(90deg, #251918 0px, #251918 1px, transparent 1px, transparent 40px)',
+            'repeating-linear-gradient(0deg, var(--color-on-surface) 0px, var(--color-on-surface) 1px, transparent 1px, transparent 40px), repeating-linear-gradient(90deg, var(--color-on-surface) 0px, var(--color-on-surface) 1px, transparent 1px, transparent 40px)',
         }}
       />
       {/* Soft map-like tones */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-teal-100 to-emerald-200 opacity-80" />
+      <div className="absolute inset-0 bg-gradient-to-br from-surface-container-low via-surface-container to-surface-container-highest opacity-80" />
 
       {/* Pin */}
       <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
@@ -27,7 +27,7 @@ export function MapPlaceholder({ location }: MapPlaceholderProps) {
 
       {/* Location label */}
       <div className="absolute bottom-3 right-4">
-        <span className="text-xs font-semibold text-emerald-700">{location}</span>
+        <span className="text-xs font-semibold text-secondary">{location}</span>
       </div>
     </div>
   );

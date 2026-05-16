@@ -27,7 +27,7 @@ export default async function Home() {
               />
             ) : (
               <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
-                <span className="font-quicksand-bold text-lg text-white">
+                <span className="font-quicksand-bold text-lg text-on-primary">
                   {(session?.user.username || 'U').charAt(0).toUpperCase()}
                 </span>
               </div>

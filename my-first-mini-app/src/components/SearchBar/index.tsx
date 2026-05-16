@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { twMerge } from 'tailwind-merge';
 
 const CATEGORIES = ['All', 'Hiking', 'Surf', 'Yoga', 'Social', 'Cultura'];
 
@@ -31,55 +33,43 @@ export const SearchBar = ({ onSearch, onFilterClick, onCategoryChange }: SearchB
       {/* Search row */}
       <div className="flex items-stretch gap-4">
         {/* Input container */}
-        <div
-          className="flex-grow flex items-center gap-3 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 bg-surface-container-lowest border border-outline-variant rounded-xl px-4"
-          style={{ boxShadow: 'var(--shadow-card)' }}
-        >
+        <div className="flex-grow flex items-center gap-3 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 bg-surface-container-lowest border border-outline-variant rounded-xl px-4 shadow-card">
           <Search size={20} className="flex-shrink-0 text-on-surface-variant" />
           <input
             type="text"
             value={searchQuery}
             onChange={handleInputChange}
             placeholder="Find your next adventure..."
-            className="flex-1 bg-transparent focus:outline-none text-on-surface"
-            style={{ padding: '16px 0', fontSize: 14 }}
+            className="flex-1 bg-transparent focus:outline-none text-on-surface font-body-sm py-3.5"
           />
         </div>
 
         {/* Filter button */}
-        <button
-          type="button"
+        <Button
+          variant="outline"
+          size="icon"
           onClick={onFilterClick}
           aria-label="Filtros"
-          className="flex items-center justify-center bg-surface-container-lowest border border-outline-variant rounded-xl text-on-surface-variant shrink-0"
-          style={{ padding: '0 16px', boxShadow: 'var(--shadow-card)', minWidth: 54 }}
+          className="bg-surface-container-lowest border-outline-variant rounded-xl text-on-surface-variant shadow-card h-auto w-14"
         >
-          <SlidersHorizontal size={22} className="text-on-surface-variant" />
-        </button>
+          <SlidersHorizontal size={22} />
+        </Button>
       </div>
 
-      {/* Category chips — horizontal scroll, no scrollbar */}
-      <div
-        className="flex gap-3 overflow-x-auto pb-1"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
-      >
+      {/* Category chips */}
+      <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none">
         {CATEGORIES.map((cat) => {
           const isActive = activeCategory === cat;
           return (
             <button
               key={cat}
               onClick={() => handleCategoryClick(cat)}
-              className="flex-shrink-0 transition-colors"
-              style={{
-                padding: '10px 20px',
-                borderRadius: 9999,
-                fontSize: 12,
-                fontWeight: 600,
-                letterSpacing: '0.05em',
-                backgroundColor: isActive ? 'var(--color-tertiary-fixed)' : 'var(--color-surface-container)',
-                color: isActive ? 'var(--color-on-tertiary-fixed)' : 'var(--color-on-surface-variant)',
-                boxShadow: isActive ? 'var(--shadow-card)' : 'var(--shadow-card-sm)',
-              }}
+              className={twMerge(
+                'flex-shrink-0 transition-colors px-5 py-2.5 rounded-full font-label-caps',
+                isActive
+                  ? 'bg-tertiary-fixed text-on-tertiary-fixed shadow-card'
+                  : 'bg-surface-container text-on-surface-variant shadow-card-sm',
+              )}
             >
               {cat}
             </button>

@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { ImageIcon, ChevronLeft, Heart, Settings, Check, Share2, MapPin, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface HeroSectionProps {
   title: string;
@@ -24,7 +25,7 @@ export function HeroSection({
   hearted, onToggleHeart, isCreator, onManage, onShare, shareCopied, onBack,
 }: HeroSectionProps) {
   return (
-    <section className="relative w-full overflow-hidden h-[530px] md:rounded-2xl md:mx-auto md:max-w-4xl md:mt-8">
+    <section aria-label="Experience hero" className="relative w-full overflow-hidden h-[530px] md:rounded-2xl md:mx-auto md:max-w-4xl md:mt-8">
       {heroImgError ? (
         <div className="absolute inset-0 flex items-center justify-center bg-surface-variant">
           <ImageIcon size={72} strokeWidth={1.5} className="text-outline" />
@@ -38,17 +39,23 @@ export function HeroSection({
 
       {/* Floating action buttons */}
       <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-center pt-8">
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={onBack}
-          className="w-10 h-10 rounded-full bg-surface/90 backdrop-blur flex items-center justify-center text-on-surface shadow-sm"
+          aria-label="Go back"
+          className="bg-surface/90 backdrop-blur shadow-sm text-on-surface"
         >
-          <ChevronLeft size={20} strokeWidth={2.5} className="text-on-surface" />
-        </button>
+          <ChevronLeft size={20} strokeWidth={2.5} />
+        </Button>
 
         <div className="flex gap-2">
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onToggleHeart}
-            className="w-10 h-10 rounded-full bg-surface/90 backdrop-blur flex items-center justify-center text-on-surface shadow-sm"
+            aria-label={hearted ? 'Remove from favorites' : 'Add to favorites'}
+            className="bg-surface/90 backdrop-blur shadow-sm text-on-surface"
           >
             <Heart
               size={20}
@@ -56,41 +63,46 @@ export function HeroSection({
               className={hearted ? 'text-primary' : 'text-on-surface'}
               strokeWidth={2}
             />
-          </button>
+          </Button>
 
           {isCreator ? (
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={onManage}
-              className="w-10 h-10 rounded-full bg-surface/90 backdrop-blur flex items-center justify-center text-on-surface shadow-sm"
+              aria-label="Manage experience"
+              className="bg-surface/90 backdrop-blur shadow-sm text-on-surface"
             >
-              <Settings size={20} strokeWidth={2} className="text-on-surface" />
-            </button>
+              <Settings size={20} strokeWidth={2} />
+            </Button>
           ) : (
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={onShare}
               aria-label="Share"
-              className={`w-10 h-10 rounded-full backdrop-blur flex items-center justify-center text-on-surface shadow-sm transition-colors ${
-                shareCopied ? 'bg-emerald-500/90' : 'bg-surface/90'
+              className={`backdrop-blur shadow-sm transition-colors ${
+                shareCopied ? 'bg-primary/90 text-on-primary' : 'bg-surface/90 text-on-surface'
               }`}
             >
               {shareCopied ? (
-                <Check size={18} className="text-white" strokeWidth={2.5} />
+                <Check size={18} strokeWidth={2.5} />
               ) : (
-                <Share2 size={20} strokeWidth={2} className="text-on-surface" />
+                <Share2 size={20} strokeWidth={2} />
               )}
-            </button>
+            </Button>
           )}
         </div>
       </div>
 
       {/* Title + location + rating — pinned to bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col gap-2 text-white">
-        <h1 className="font-quicksand-bold text-[40px] leading-tight tracking-tight drop-shadow-sm">
+      <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col gap-2 text-background">
+        <h1 className="text-4xl font-quicksand-bold leading-tight tracking-tight drop-shadow-sm">
           {title}
         </h1>
-        <div className="flex items-center gap-4 mt-1 text-white/95">
+        <div className="flex items-center gap-4 mt-1 text-background/95">
           <div className="flex items-center gap-1.5">
-            <MapPin size={18} className="text-white/90" strokeWidth={2} />
+            <MapPin size={18} className="text-background/90" strokeWidth={2} />
             <span className="text-lg leading-relaxed">{location}</span>
           </div>
           <div className="flex items-center gap-1.5 ml-auto rounded-full px-3 py-1 bg-black/30 backdrop-blur-sm">

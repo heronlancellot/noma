@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { UseFormRegister, Control, FieldErrors, Controller } from 'react-hook-form';
 import { CreateFormData } from '@/features/create-experience/types';
 import { MapPin, Clock, Users, CreditCard, Calendar, ChevronDown } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { CreateExperienceHeader } from '@/features/create-experience/components/Header';
 import { CreateExperienceFooter } from '@/features/create-experience/components/Footer';
 
@@ -14,7 +15,7 @@ const DURATIONS = ['1 hour', '2 hours', '3 hours', '4+ hours'];
 const CARD = 'bg-surface-container-lowest rounded-2xl border border-outline-variant/25 px-4 py-4';
 const LABEL = 'font-body-sm font-semibold text-primary-container mb-2';
 const INPUT_ROW = 'flex items-center gap-2.5';
-const INPUT_BASE = 'flex-1 bg-transparent border-none text-base text-on-surface placeholder:text-secondary/35 focus:ring-0 focus:outline-none';
+const INPUT_BASE = 'flex-1 bg-transparent border-none font-body-md text-on-surface placeholder:text-secondary/35 focus:ring-0 focus:outline-none h-auto p-0 rounded-none shadow-none';
 
 const Err = ({ msg }: { msg?: string }) =>
   msg ? <p className="text-xs text-error font-semibold mt-1">{msg}</p> : null;
@@ -26,7 +27,7 @@ function DatePickerInput({ value, onChange, hasError }: { value: string; onChang
       <p className={LABEL}>Date &amp; Time</p>
       <div className={INPUT_ROW}>
         <Calendar size={18} className="text-on-surface-variant flex-shrink-0" />
-        <input
+        <Input
           type="datetime-local"
           value={value}
           onChange={e => onChange(e.target.value)}
@@ -60,7 +61,7 @@ export default function CreateExperienceStep2({ register, control, errors, onNex
           <p className={LABEL}>Location</p>
           <div className={INPUT_ROW}>
             <MapPin size={18} className="text-on-surface-variant flex-shrink-0" />
-            <input
+            <Input
               type="text"
               {...register('location', { required: 'Required' })}
               placeholder="Search places..."
@@ -112,7 +113,7 @@ export default function CreateExperienceStep2({ register, control, errors, onNex
             <p className={LABEL}>Max Guests</p>
             <div className={INPUT_ROW}>
               <Users size={18} className="text-on-surface-variant flex-shrink-0" />
-              <input
+              <Input
                 type="number"
                 {...register('maxGuests', { required: 'Required', min: { value: 1, message: 'Required' } })}
                 placeholder="e.g. 10"
@@ -130,7 +131,7 @@ export default function CreateExperienceStep2({ register, control, errors, onNex
           <div className={INPUT_ROW}>
             <CreditCard size={18} className="text-on-surface-variant flex-shrink-0" />
             <span className="text-base text-on-surface">$</span>
-            <input
+            <Input
               type="number"
               {...register('price', { required: 'Required' })}
               placeholder="0.00"

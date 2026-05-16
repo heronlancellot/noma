@@ -1,5 +1,7 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
+
 interface OrganizerCardProps {
   name: string;
   peopleMet: number;
@@ -16,9 +18,14 @@ export function OrganizerCard({
     <div
       className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-outline-variant/10 flex items-center justify-between cursor-pointer active:opacity-80 transition-opacity"
       onClick={onViewProfile}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onViewProfile();
+        }
+      }}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && onViewProfile()}
     >
       <div className="flex items-center gap-4">
         {/* Avatar */}
@@ -30,20 +37,24 @@ export function OrganizerCard({
         </div>
 
         <div>
-          <h3 className="font-h3 text-h3 text-on-surface">{name}</h3>
-          <p className="font-body-sm text-body-sm text-secondary">
+          <h3 className="font-h3 text-on-surface">{name}</h3>
+          <p className="font-body-sm text-secondary">
             Experience Host<br />
             ({peopleMet} joined)
           </p>
         </div>
       </div>
 
-      <button
-        onClick={onMessage}
-        className="border border-primary/30 px-5 py-2.5 rounded-full text-primary text-[14px] font-semibold hover:bg-primary/5 transition-colors"
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={(e) => {
+          e.stopPropagation();
+          onMessage(e);
+        }}
       >
         Message
-      </button>
+      </Button>
     </div>
   );
 }

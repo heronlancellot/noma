@@ -4,6 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ChevronLeft, ChevronDown, Send, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface ReportFormData {
   experienceName: string;
@@ -16,7 +20,7 @@ const EXPERIENCES = ['Sunrise Ridge Trek', 'Morning Swell Session', 'Sunset Kaya
 const ISSUE_TYPES = ['Host Behavior', 'Location Inaccuracy', 'Safety Concern', 'App/Technical Bug', 'Other'];
 
 const SadMascot = () => (
-  <Image src="/nomajin-sad.png" width={80} height={80} alt="NOMAJIN triste" style={{ objectFit: 'contain' }} />
+  <Image src="/nomajin-sad.png" width={80} height={80} alt="NOMAJIN triste" className="object-contain" />
 );
 
 export function ReportPage() {
@@ -60,47 +64,28 @@ export function ReportPage() {
     setSubmitted(true);
   };
 
-  const inputStyle = (hasError: boolean) => ({
-    width: '100%',
-    padding: '12px 16px',
-    borderRadius: 12,
-    border: `1.5px solid ${hasError ? '#ef4444' : '#e5e7eb'}`,
-    backgroundColor: '#fff',
-    color: '#0d1f35',
-    fontSize: 14,
-    outline: 'none',
-  });
-
   if (submitted) {
     return (
-      <div style={{ backgroundColor: '#ecd5d3', minHeight: '100vh' }} className="flex flex-col items-center justify-center px-6">
+      <div className="min-h-screen bg-surface-container flex flex-col items-center justify-center px-6">
         <div className="text-center">
           <div className="text-6xl mb-4">✅</div>
-          <h2 className="text-[22px] font-bold mb-2" style={{ color: '#0d1f35' }}>Report Submitted!</h2>
-          <p className="text-[14px] mb-8" style={{ color: '#5a5a6e' }}>We&apos;ll review it and get back to you soon.</p>
-          <button
-            onClick={() => router.push('/')}
-            className="px-8 py-3 rounded-full font-bold text-[15px] text-white"
-            style={{ backgroundColor: '#db5852' }}
-          >
+          <h2 className="font-h2 text-foreground mb-2">Report Submitted!</h2>
+          <p className="font-body-sm text-secondary mb-8">We&apos;ll review it and get back to you soon.</p>
+          <Button variant="primary" size="lg" onClick={() => router.push('/')}>
             Back to Home
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ backgroundColor: '#ecd5d3', minHeight: '100vh' }}>
+    <div className="min-h-screen bg-surface-container">
       {/* Back button */}
       <div className="px-4 pt-12 pb-2">
-        <button
-          onClick={() => router.back()}
-          className="w-9 h-9 flex items-center justify-center rounded-full"
-          style={{ backgroundColor: 'rgba(0,0,0,0.08)' }}
-        >
-          <ChevronLeft size={20} strokeWidth={2.5} className="text-foreground" />
-        </button>
+        <Button variant="ghost" size="icon-sm" onClick={() => router.back()} className="bg-black/8">
+          <ChevronLeft size={20} strokeWidth={2.5} />
+        </Button>
       </div>
 
       {/* Mascot + heading */}
@@ -108,8 +93,8 @@ export function ReportPage() {
         <div className="flex justify-center mb-4">
           <SadMascot />
         </div>
-        <h1 className="text-[28px] font-bold mb-2" style={{ color: '#0d1f35' }}>Oh no!</h1>
-        <p className="text-[14px] leading-relaxed" style={{ color: '#5a5a6e' }}>
+        <h1 className="font-h1 text-foreground mb-2">Oh no!</h1>
+        <p className="font-body-sm text-secondary leading-relaxed">
           We&apos;re sorry things didn&apos;t go as planned. Let us know how we can help make it right.
         </p>
       </div>
@@ -117,117 +102,122 @@ export function ReportPage() {
       {/* Form card */}
       <div className="px-4 pb-12">
         <form onSubmit={handleSubmit}>
-          <div className="rounded-2xl p-5 space-y-5" style={{ backgroundColor: '#fff', boxShadow: '0 2px 12px rgba(13,31,53,0.08)' }}>
+          <div className="bg-surface-container-lowest rounded-2xl p-5 space-y-5 shadow-sm">
 
             {/* Experience Name */}
             <div>
-              <label className="block text-[12px] font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#0d1f35' }}>
+              <Label className="font-label-caps text-foreground mb-1.5">
                 Experience Name
-              </label>
+              </Label>
               <div className="relative">
                 <select
                   value={formData.experienceName}
                   onChange={handleSelectChange('experienceName')}
-                  className="w-full appearance-none pr-10 focus:outline-none"
-                  style={{ ...inputStyle(!!errors.experienceName), color: formData.experienceName ? '#0d1f35' : '#9ca3af' }}
+                  className={`w-full appearance-none pr-10 px-4 py-3 rounded-xl border-[1.5px] bg-surface-container-lowest text-foreground font-body-sm focus:outline-none ${
+                    errors.experienceName ? 'border-error' : 'border-outline-variant'
+                  } ${!formData.experienceName ? 'text-outline' : ''}`}
                 >
                   <option value="">Select an experience</option>
                   {EXPERIENCES.map(e => <option key={e} value={e}>{e}</option>)}
                 </select>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"><ChevronDown size={16} strokeWidth={2} className="text-secondary" /></div>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <ChevronDown size={16} strokeWidth={2} className="text-secondary" />
+                </div>
               </div>
-              {errors.experienceName && <p className="mt-1 text-[12px]" style={{ color: '#ef4444' }}>{errors.experienceName}</p>}
+              {errors.experienceName && <p className="mt-1 text-xs text-error">{errors.experienceName}</p>}
             </div>
 
             {/* Type of Issue */}
             <div>
-              <label className="block text-[12px] font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#0d1f35' }}>
+              <Label className="font-label-caps text-foreground mb-1.5">
                 Type of Issue
-              </label>
+              </Label>
               <div className="relative">
                 <select
                   value={formData.typeOfIssue}
                   onChange={handleSelectChange('typeOfIssue')}
-                  className="w-full appearance-none pr-10 focus:outline-none"
-                  style={{ ...inputStyle(!!errors.typeOfIssue), color: formData.typeOfIssue ? '#0d1f35' : '#9ca3af' }}
+                  className={`w-full appearance-none pr-10 px-4 py-3 rounded-xl border-[1.5px] bg-surface-container-lowest text-foreground font-body-sm focus:outline-none ${
+                    errors.typeOfIssue ? 'border-error' : 'border-outline-variant'
+                  } ${!formData.typeOfIssue ? 'text-outline' : ''}`}
                 >
                   <option value="">Select a category</option>
                   {ISSUE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"><ChevronDown size={16} strokeWidth={2} className="text-secondary" /></div>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <ChevronDown size={16} strokeWidth={2} className="text-secondary" />
+                </div>
               </div>
-              {errors.typeOfIssue && <p className="mt-1 text-[12px]" style={{ color: '#ef4444' }}>{errors.typeOfIssue}</p>}
+              {errors.typeOfIssue && <p className="mt-1 text-xs text-error">{errors.typeOfIssue}</p>}
             </div>
 
             {/* What Happened */}
             <div>
-              <label className="block text-[12px] font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#0d1f35' }}>
+              <Label className="font-label-caps text-foreground mb-1.5">
                 What Happened?
-              </label>
-              <textarea
+              </Label>
+              <Textarea
                 name="whatHappened"
                 value={formData.whatHappened}
                 onChange={handleInputChange}
                 placeholder="Please provide details about your experience..."
                 rows={4}
-                className="w-full focus:outline-none resize-none"
-                style={inputStyle(!!errors.whatHappened)}
+                className={`resize-none rounded-xl border-[1.5px] ${
+                  errors.whatHappened ? 'border-error' : 'border-outline-variant'
+                }`}
               />
-              {errors.whatHappened && <p className="mt-1 text-[12px]" style={{ color: '#ef4444' }}>{errors.whatHappened}</p>}
+              {errors.whatHappened && <p className="mt-1 text-xs text-error">{errors.whatHappened}</p>}
             </div>
 
             {/* Attach Evidence */}
             <div>
-              <label className="block text-[12px] font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#0d1f35' }}>
+              <Label className="font-label-caps text-foreground mb-1.5">
                 Attach Evidence
-              </label>
+              </Label>
               <div className="flex gap-3">
-                {/* Placeholder existing image */}
-                <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0" style={{ border: '1.5px solid #e5e7eb' }}>
-                  <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#f5ede9' }}>
+                <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border-[1.5px] border-outline-variant">
+                  <div className="w-full h-full flex items-center justify-center bg-surface-container-low">
                     <SadMascot />
                   </div>
                 </div>
-                {/* Add button */}
-                <button
+                <Button
                   type="button"
-                  className="w-20 h-20 rounded-xl flex flex-col items-center justify-center gap-1 flex-shrink-0"
-                  style={{ border: '1.5px dashed #e5c5c0', backgroundColor: '#fdf5f4' }}
+                  variant="outline"
+                  className="w-20 h-20 rounded-xl flex flex-col items-center justify-center gap-1 flex-shrink-0 border-dashed border-[1.5px] border-outline-variant bg-surface"
                 >
                   <Plus size={20} strokeWidth={2} className="text-outline" />
-                  <span className="text-[10px] font-semibold uppercase" style={{ color: '#9ca3af' }}>Add</span>
-                </button>
+                  <span className="text-xs font-semibold uppercase text-outline">Add</span>
+                </Button>
               </div>
-              <p className="mt-2 text-[11px] italic" style={{ color: '#9ca3af' }}>You can upload multiple photos or videos</p>
+              <p className="mt-2 text-xs italic text-outline">You can upload multiple photos or videos</p>
             </div>
 
             {/* Contact Email */}
             <div>
-              <label className="block text-[12px] font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#0d1f35' }}>
+              <Label className="font-label-caps text-foreground mb-1.5">
                 Contact E-mail
-              </label>
-              <input
+              </Label>
+              <Input
                 type="email"
                 name="contactEmail"
                 value={formData.contactEmail}
                 onChange={handleInputChange}
                 placeholder="hello@example.com"
-                className="focus:outline-none"
-                style={inputStyle(false)}
+                className="rounded-xl border-[1.5px] border-outline-variant"
               />
             </div>
 
             {/* Submit */}
-            <button
+            <Button
               type="submit"
+              variant="primary"
+              size="xl"
               disabled={isSubmitting}
-              className="w-full py-3.5 rounded-full font-bold text-[15px] flex items-center justify-center gap-2 transition-opacity"
-              style={{ backgroundColor: '#db5852', color: '#fff', opacity: isSubmitting ? 0.7 : 1 }}
+              className="rounded-full"
             >
               {isSubmitting ? 'Submitting...' : (
-                <>Submit Report <Send size={16} strokeWidth={2} className="text-white" /></>
+                <>Submit Report <Send size={16} strokeWidth={2} /></>
               )}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

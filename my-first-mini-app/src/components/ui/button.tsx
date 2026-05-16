@@ -5,37 +5,36 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-full border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-transparent font-semibold whitespace-nowrap transition-all outline-none select-none active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 [a]:hover:bg-primary/80",
-        primary: "bg-noma-btn text-on-primary shadow-lg hover:opacity-90",
-        outline:
-          "border-border bg-background text-foreground hover:bg-muted aria-expanded:bg-muted dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
-        secondary: "bg-transparent text-secondary font-semibold hover:text-on-surface transition-colors border-0",
-        ghost:
-          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground",
-        destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
-        link: "text-primary underline-offset-4 hover:underline",
+        // Primary CTA — coral red (noma-btn)
+        primary: "bg-noma-btn text-white shadow-md hover:opacity-90",
+        // Outline — bordered
+        outline: "border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-low",
+        // Secondary — text-only, no bg
+        secondary: "bg-transparent text-secondary font-semibold hover:text-on-surface",
+        // Ghost — subtle hover
+        ghost: "bg-transparent text-on-surface-variant hover:bg-surface-container-low",
+        // Destructive
+        destructive: "bg-error/10 text-error hover:bg-error/20",
+        // Link
+        link: "bg-transparent text-primary underline-offset-4 hover:underline p-0 h-auto",
       },
       size: {
-        default:
-          "h-9 gap-1.5 px-4 text-sm has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
-        xs: "h-6 gap-1 rounded-full px-2.5 text-xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-8 gap-1 rounded-full px-3.5 text-sm has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-11 gap-2 px-6 text-base has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
-        xl: "h-14 gap-2 px-8 text-base font-semibold tracking-wide has-data-[icon=inline-end]:pr-6 has-data-[icon=inline-start]:pl-6",
-        icon: "size-9",
-        "icon-xs": "size-6 rounded-full [&_svg:not([class*='size-'])]:size-3",
+        xs: "h-7 px-3 text-xs rounded-full",
+        sm: "h-9 px-4 text-sm rounded-full",
+        default: "h-11 px-6 text-sm rounded-full",
+        lg: "h-12 px-8 text-base rounded-full",
+        // Full-width CTA — used for main actions
+        xl: "h-14 w-full px-8 text-base rounded-2xl",
+        icon: "size-10 rounded-full",
         "icon-sm": "size-8 rounded-full",
-        "icon-lg": "size-11",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "primary",
       size: "default",
     },
   }
@@ -43,7 +42,7 @@ const buttonVariants = cva(
 
 function Button({
   className,
-  variant = "default",
+  variant = "primary",
   size = "default",
   asChild = false,
   ...props
@@ -56,8 +55,6 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      data-variant={variant}
-      data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />
